@@ -14,7 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        'fredoka': ['Fredoka', 'sans-serif'],
+        'heading': ['Avenir Next', 'Avenir', 'system-ui', 'sans-serif'],
+        'sans': ['Montserrat', 'system-ui', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
