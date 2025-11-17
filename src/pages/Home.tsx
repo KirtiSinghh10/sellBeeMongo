@@ -5,13 +5,13 @@ import Navbar from "@/components/Navbar";
 
 const Home = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background font-fredoka">
       <Navbar />
       
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-20 text-center">
         <div className="max-w-4xl mx-auto">
-          <div className="text-6xl mb-6 animate-bounce">🐝</div>
+          <div className="text-6xl mb-6 animate-float">🐝</div>
           <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-honey via-honey-light to-honey bg-clip-text text-transparent">
             Your Campus Marketplace
           </h1>
@@ -32,36 +32,36 @@ const Home = () => {
       {/* Features */}
       <section className="container mx-auto px-4 py-20">
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div className="bg-card p-6 rounded-2xl border border-border hover:border-honey transition-colors">
-            <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-              <ShoppingBag className="h-6 w-6 text-honey" />
+          <div className="group bg-card p-6 rounded-2xl border border-border hover:border-honey transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-honey/20 cursor-pointer">
+            <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-honey/20 group-hover:scale-110 transition-all duration-300">
+              <ShoppingBag className="h-6 w-6 text-honey group-hover:rotate-12 transition-transform duration-300" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">Easy Buying & Selling</h3>
-            <p className="text-muted-foreground">List items in minutes and connect with buyers instantly</p>
+            <h3 className="text-xl font-semibold mb-2 group-hover:text-honey transition-colors">Easy Buying & Selling</h3>
+            <p className="text-muted-foreground group-hover:text-foreground transition-colors">List items in minutes and connect with buyers instantly</p>
           </div>
 
-          <div className="bg-card p-6 rounded-2xl border border-border hover:border-honey transition-colors">
-            <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-              <Users className="h-6 w-6 text-honey" />
+          <div className="group bg-card p-6 rounded-2xl border border-border hover:border-honey transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-honey/20 cursor-pointer">
+            <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-honey/20 group-hover:scale-110 transition-all duration-300">
+              <Users className="h-6 w-6 text-honey group-hover:rotate-12 transition-transform duration-300" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">College Community</h3>
-            <p className="text-muted-foreground">Trade safely within your trusted campus network</p>
+            <h3 className="text-xl font-semibold mb-2 group-hover:text-honey transition-colors">College Community</h3>
+            <p className="text-muted-foreground group-hover:text-foreground transition-colors">Trade safely within your trusted campus network</p>
           </div>
 
-          <div className="bg-card p-6 rounded-2xl border border-border hover:border-honey transition-colors">
-            <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-              <TrendingUp className="h-6 w-6 text-honey" />
+          <div className="group bg-card p-6 rounded-2xl border border-border hover:border-honey transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-honey/20 cursor-pointer">
+            <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-honey/20 group-hover:scale-110 transition-all duration-300">
+              <TrendingUp className="h-6 w-6 text-honey group-hover:rotate-12 transition-transform duration-300" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">Great Deals</h3>
-            <p className="text-muted-foreground">Find amazing prices on pre-loved items from students</p>
+            <h3 className="text-xl font-semibold mb-2 group-hover:text-honey transition-colors">Great Deals</h3>
+            <p className="text-muted-foreground group-hover:text-foreground transition-colors">Find amazing prices on pre-loved items from students</p>
           </div>
 
-          <div className="bg-card p-6 rounded-2xl border border-border hover:border-honey transition-colors">
-            <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-              <Shield className="h-6 w-6 text-honey" />
+          <div className="group bg-card p-6 rounded-2xl border border-border hover:border-honey transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-honey/20 cursor-pointer">
+            <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-honey/20 group-hover:scale-110 transition-all duration-300">
+              <Shield className="h-6 w-6 text-honey group-hover:rotate-12 transition-transform duration-300" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">Secure Contact</h3>
-            <p className="text-muted-foreground">Connect via WhatsApp or Telegram for safe transactions</p>
+            <h3 className="text-xl font-semibold mb-2 group-hover:text-honey transition-colors">Secure Contact</h3>
+            <p className="text-muted-foreground group-hover:text-foreground transition-colors">Connect via WhatsApp or Telegram for safe transactions</p>
           </div>
         </div>
       </section>
