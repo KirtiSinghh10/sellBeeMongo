@@ -27,6 +27,11 @@ const Navbar = ({ isAuthenticated = false, onLogout }: NavbarProps) => {
                   Marketplace
                 </Link>
               </Button>
+              <Button variant="ghost" asChild>
+                <Link to="/auction" className="flex items-center gap-2">
+                  🔨 Auction
+                </Link>
+              </Button>
               <Button variant="default" asChild>
                 <Link to="/add-listing" className="flex items-center gap-2">
                   <Plus className="h-4 w-4" />
