@@ -1,77 +1,126 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "@/components/ui/card";
+import { useAuth } from "@/context/AuthContent";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
 
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [collegeId, setCollegeId] = useState("");
+
+  const [loading, setLoading] = useState(false);
+
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault(); // 🔥 REQUIRED
+    setLoading(true);
+
+    try {
+      const res = await fetch(
+        isLogin
+          ? "http://localhost:5000/auth/login"
+          : "http://localhost:5000/auth/signup",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(
+            isLogin
+              ? { email, password }
+              : { name, email, password, collegeId }
+          ),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Authentication failed");
+      }
+
+      login(data.user);
+      navigate("/");
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4 font-fredoka">
-      <div className="w-full max-w-md">
-        <Link to="/" className="flex items-center justify-center gap-2 mb-8">
-          <div className="text-4xl">🐝</div>
-          <span className="text-3xl font-bold bg-gradient-to-r from-honey to-honey-light bg-clip-text text-transparent">
-            SellBee
-          </span>
-        </Link>
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="text-center">
+            {isLogin ? "Login" : "Create Account"}
+          </CardTitle>
+        </CardHeader>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>{isLogin ? "Welcome back" : "Create account"}</CardTitle>
-            <CardDescription>
-              {isLogin 
-                ? "Login to your SellBee account" 
-                : "Join your campus marketplace"}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form className="space-y-4">
-              {!isLogin && (
-                <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
-                  <Input id="name" placeholder="John Doe" />
-                </div>
-              )}
-              
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="your.email@college.edu" />
-              </div>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {!isLogin && (
+              <>
+                <Input
+                  placeholder="Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
 
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" placeholder="••••••••" />
-              </div>
+                <Input
+                  placeholder="College ID"
+                  value={collegeId}
+                  onChange={(e) => setCollegeId(e.target.value)}
+                  required
+                />
+              </>
+            )}
 
-              {!isLogin && (
-                <div className="space-y-2">
-                  <Label htmlFor="collegeId">College ID</Label>
-                  <Input id="collegeId" placeholder="BMSCE2024" />
-                </div>
-              )}
+            <Input
+              placeholder="College Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
 
-              <Button type="submit" className="w-full">
-                {isLogin ? "Login" : "Create Account"}
-              </Button>
+            <Input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
 
-              <div className="text-center text-sm">
-                <button
-                  type="button"
-                  onClick={() => setIsLogin(!isLogin)}
-                  className="text-honey hover:text-honey-light transition-colors"
-                >
-                  {isLogin 
-                    ? "Don't have an account? Sign up" 
-                    : "Already have an account? Login"}
-                </button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading
+                ? "Please wait..."
+                : isLogin
+                ? "Login"
+                : "Create Account"}
+            </Button>
+
+            <p
+              className="text-sm text-center text-muted-foreground cursor-pointer"
+              onClick={() => setIsLogin(!isLogin)}
+            >
+              {isLogin
+                ? "Don’t have an account? Create one"
+                : "Already have an account? Login"}
+            </p>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 };
