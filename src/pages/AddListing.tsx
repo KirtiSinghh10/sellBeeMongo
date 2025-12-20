@@ -6,24 +6,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContent";
 
-const MAX_LISTINGS = 5;
+const MAX_IMAGES = 5;
 
 const AddListing = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, token } = useAuth();
 
   const [loading, setLoading] = useState(false);
-  const [userListingCount, setUserListingCount] = useState(0);
+  const [images, setImages] = useState<File[]>([]);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -33,59 +26,55 @@ const AddListing = () => {
     condition: "good",
   });
 
-  /* 🔐 Redirect if not logged in */
   useEffect(() => {
-    if (!user) {
-      navigate("/auth");
+    if (!user) navigate("/auth");
+  }, [user, navigate]);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+
+    const selected = Array.from(e.target.files);
+    if (selected.length > MAX_IMAGES) {
+      toast.error(`Max ${MAX_IMAGES} images allowed`);
       return;
     }
 
-    // TODO: fetch listing count from backend later
-    setUserListingCount(0);
-  }, [user, navigate]);
+    setImages(selected);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!user) {
-      navigate("/auth");
-      return;
-    }
-
-    if (userListingCount >= MAX_LISTINGS) {
-      toast.error(`You've reached the maximum limit of ${MAX_LISTINGS} listings.`);
-      return;
-    }
+    if (!user || !token) return;
 
     setLoading(true);
 
     try {
+      const data = new FormData();
+      data.append("title", formData.title);
+      data.append("description", formData.description);
+      data.append("price", formData.price);
+      data.append("category", formData.category);
+      data.append("condition", formData.condition);
+      data.append("sellerCollegeId", user.collegeId);
+      data.append("sellerEmail", user.email);
+
+      images.forEach((img) => data.append("images", img));
+
       const res = await fetch("http://localhost:5000/products/add", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          title: formData.title,
-          description: formData.description,
-          price: Number(formData.price),
-          category: formData.category,
-          condition: formData.condition,
-          sellerCollegeId: user.collegeId,
-          sellerEmail: user.email,
-        }),
+        body: data,
       });
 
-      const data = await res.json();
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message);
 
-      if (!res.ok) {
-        throw new Error(data.message || "Failed to create listing");
-      }
-
-      toast.success("Listing posted successfully!");
+      toast.success("Listing posted!");
       navigate("/marketplace");
     } catch (err: any) {
-      toast.error(err.message || "Something went wrong");
+      toast.error(err.message || "Upload failed");
     } finally {
       setLoading(false);
     }
@@ -95,99 +84,77 @@ const AddListing = () => {
     <div className="min-h-screen bg-background font-fredoka">
       <Navbar />
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-2xl mx-auto">
-          <h1 className="text-4xl font-bold mb-2 text-black">Post an Ad</h1>
-          <p className="text-sm text-muted-foreground mb-8">
-            You have {MAX_LISTINGS - userListingCount} listing(s) remaining
-          </p>
+      <div className="container mx-auto px-4 py-8 max-w-2xl">
+        <Card>
+          <CardHeader>
+            <CardTitle>Post an Ad</CardTitle>
+          </CardHeader>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Item Details</CardTitle>
-            </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <Label>Title</Label>
+                <Input
+                  value={formData.title}
+                  onChange={(e) =>
+                    setFormData({ ...formData, title: e.target.value })
+                  }
+                  required
+                />
+              </div>
 
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <Label>Title</Label>
-                  <Input
-                    value={formData.title}
-                    onChange={(e) =>
-                      setFormData({ ...formData, title: e.target.value })
-                    }
-                    required
-                  />
+              <div>
+                <Label>Description</Label>
+                <Textarea
+                  value={formData.description}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
+                  required
+                />
+              </div>
+
+              <div>
+                <Label>Price</Label>
+                <Input
+                  type="number"
+                  value={formData.price}
+                  onChange={(e) =>
+                    setFormData({ ...formData, price: e.target.value })
+                  }
+                  required
+                />
+              </div>
+
+              <div>
+                <Label>Images (max 5)</Label>
+                <Input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleImageChange}
+                />
+              </div>
+
+              {/* IMAGE PREVIEW */}
+              {images.length > 0 && (
+                <div className="grid grid-cols-3 gap-2">
+                  {images.map((img, i) => (
+                    <img
+                      key={i}
+                      src={URL.createObjectURL(img)}
+                      className="h-24 w-full object-cover rounded-md"
+                    />
+                  ))}
                 </div>
+              )}
 
-                <div>
-                  <Label>Description</Label>
-                  <Textarea
-                    value={formData.description}
-                    onChange={(e) =>
-                      setFormData({ ...formData, description: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-
-                <div>
-                  <Label>Price</Label>
-                  <Input
-                    type="number"
-                    value={formData.price}
-                    onChange={(e) =>
-                      setFormData({ ...formData, price: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-
-                <div>
-                  <Label>Category</Label>
-                  <Select
-                    onValueChange={(value) =>
-                      setFormData({ ...formData, category: value })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Books">Books</SelectItem>
-                      <SelectItem value="Electronics">Electronics</SelectItem>
-                      <SelectItem value="Furniture">Furniture</SelectItem>
-                      <SelectItem value="Accessories">Accessories</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label>Condition</Label>
-                  <Select
-                    defaultValue="good"
-                    onValueChange={(value) =>
-                      setFormData({ ...formData, condition: value })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="new">New</SelectItem>
-                      <SelectItem value="good">Good</SelectItem>
-                      <SelectItem value="used">Used</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Posting..." : "Post Listing"}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
+              <Button className="w-full" disabled={loading}>
+                {loading ? "Posting..." : "Post Listing"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

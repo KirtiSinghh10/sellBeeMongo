@@ -1,0 +1,186 @@
+import { useState, useEffect } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import Navbar from "@/components/Navbar";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, Mail, Loader2 } from "lucide-react";
+
+interface Listing {
+  _id: string;
+  title: string;
+  description?: string;
+  price: number;
+  condition?: string;
+  category?: string;
+  createdAt: string;
+  sellerEmail?: string;
+  sellerCollegeId?: string;
+  status?: string;
+}
+
+const ListingDetail = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+
+  const [listing, setListing] = useState<Listing | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!id) return;
+
+    const fetchListing = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/products/${id}`);
+
+        if (!res.ok) {
+          throw new Error("Listing not found");
+        }
+
+        const data = await res.json();
+        setListing(data);
+      } catch (err) {
+        console.error(err);
+        setListing(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchListing();
+  }, [id]);
+
+  const formatPrice = (price: number) =>
+    new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0,
+    }).format(price);
+
+  const formatDate = (date: string) =>
+    new Date(date).toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background font-fredoka">
+        <Navbar />
+        <div className="flex items-center justify-center py-32">
+          <Loader2 className="h-8 w-8 animate-spin text-honey" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!listing) {
+    return (
+      <div className="min-h-screen bg-background font-fredoka">
+        <Navbar />
+        <div className="container mx-auto px-4 py-16 text-center">
+          <h1 className="text-2xl font-bold mb-4">Listing not found</h1>
+          <Link to="/marketplace">
+            <Button>Back to Marketplace</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background font-fredoka">
+      <Navbar />
+
+      <div className="container mx-auto px-4 py-8">
+        <Button
+          variant="ghost"
+          onClick={() => navigate(-1)}
+          className="mb-6"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back
+        </Button>
+
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Image Placeholder (future upgrade) */}
+          <div className="aspect-square bg-muted rounded-lg flex items-center justify-center text-8xl">
+            📦
+          </div>
+
+          {/* Details */}
+          <div className="space-y-6">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                {listing.category && (
+                  <Badge variant="secondary">{listing.category}</Badge>
+                )}
+
+                {listing.condition && (
+                  <Badge variant="outline" className="capitalize">
+                    {listing.condition}
+                  </Badge>
+                )}
+
+                {listing.status === "sold" && (
+                  <Badge variant="destructive">Sold</Badge>
+                )}
+              </div>
+
+              <h1 className="text-3xl font-bold mb-2">
+                {listing.title}
+              </h1>
+
+              <p className="text-4xl font-bold text-honey mb-4">
+                {formatPrice(listing.price)}
+              </p>
+
+              <p className="text-sm text-muted-foreground">
+                Posted on {formatDate(listing.createdAt)}
+              </p>
+            </div>
+
+            <div>
+              <h2 className="text-lg font-semibold mb-2">Description</h2>
+              <p className="text-muted-foreground whitespace-pre-wrap">
+                {listing.description || "No description provided"}
+              </p>
+            </div>
+
+            {/* Seller Contact */}
+            <Card>
+              <CardContent className="p-6">
+                <h2 className="text-lg font-semibold mb-4">
+                  Contact Seller
+                </h2>
+
+                {listing.sellerEmail ? (
+                  <a
+                    href={`mailto:${listing.sellerEmail}`}
+                    className="flex items-center gap-2 text-honey hover:underline"
+                  >
+                    <Mail className="h-4 w-4" />
+                    {listing.sellerEmail}
+                  </a>
+                ) : (
+                  <p className="text-muted-foreground text-sm">
+                    Seller contact not available
+                  </p>
+                )}
+
+                {listing.sellerCollegeId && (
+                  <p className="text-sm text-muted-foreground mt-2">
+                    College ID: {listing.sellerCollegeId}
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ListingDetail;

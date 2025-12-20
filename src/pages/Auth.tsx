@@ -49,7 +49,8 @@ const Auth = () => {
         throw new Error(data.message || "Authentication failed");
       }
 
-      login(data.user);
+      login(data.user, data.token);
+
       navigate("/");
     } catch (err: any) {
       alert(err.message);

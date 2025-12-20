@@ -26,7 +26,8 @@ const Marketplace = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch("/products")
+    fetch("http://localhost:5000/products")
+
 
       .then((res) => {
         if (!res.ok) {
@@ -56,9 +57,7 @@ const Marketplace = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-honey to-honey-light bg-clip-text text-transparent">
-            Marketplace
-          </h1>
+          <h1 className="text-4xl font-bold mb-4 text-black">Marketplace</h1>
 
           <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />

@@ -12,10 +12,13 @@ const Navbar = () => {
     <nav className="border-b border-border bg-card sticky top-0 z-50 backdrop-blur-sm bg-card/95">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <div className="text-3xl">🐝</div>
-          <span className="text-2xl font-bold bg-gradient-to-r from-honey to-honey-light bg-clip-text text-transparent">
-            SellBee
-          </span>
+          <div className="text-4xl">🐝</div>
+          <span className="text-3xl font-bold">
+    <span className="text- Black">
+      Sell
+    </span>
+    <span className="bg-gradient-to-r from-honey to-honey-light bg-clip-text text-transparent">Bee</span>
+  </span>
         </Link>
 
         <div className="flex items-center gap-4">
