@@ -43,25 +43,19 @@ const Profile = () => {
   // 🗑️ DELETE
   const deleteListing = async (id: string) => {
     if (!token) return;
-
     if (!confirm("Delete this listing?")) return;
 
     try {
-      const res = await fetch(
-        `http://localhost:5000/products/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await fetch(`http://localhost:5000/products/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (!res.ok) throw new Error();
 
-      setMyListings((prev) =>
-        prev.filter((l) => l._id !== id)
-      );
+      setMyListings((prev) => prev.filter((l) => l._id !== id));
     } catch {
       alert("Delete failed");
     }
@@ -83,7 +77,6 @@ const Profile = () => {
       );
 
       const updated = await res.json();
-
       setMyListings((prev) =>
         prev.map((l) => (l._id === id ? updated : l))
       );
@@ -95,15 +88,13 @@ const Profile = () => {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-background font-fredoka">
+    <div className="min-h-screen bg-background">
       <Navbar />
 
       <div className="container mx-auto px-4 py-8 max-w-4xl space-y-8">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-honey to-honey-light bg-clip-text text-transparent">
-          My Profile
-        </h1>
+        <h1 className="text-4xl font-bold">My Profile</h1>
 
-        {/* Profile */}
+        {/* PROFILE CARD */}
         <Card>
           <CardHeader>
             <CardTitle className="flex gap-2 items-center">
@@ -116,15 +107,19 @@ const Profile = () => {
             <p><strong>Name:</strong> {user.name}</p>
             <p><strong>Email:</strong> {user.email}</p>
             <p><strong>College ID:</strong> {user.collegeId}</p>
+            {user.phone && <p><strong>Phone:</strong> {user.phone}</p>}
 
-            <Button variant="outline">
+            <Button
+              variant="outline"
+              onClick={() => navigate("/users/edit")}
+            >
               <Edit className="h-4 w-4 mr-2" />
               Edit Profile
             </Button>
           </CardContent>
         </Card>
 
-        {/* Listings */}
+        {/* LISTINGS */}
         <Card>
           <CardHeader>
             <CardTitle className="flex gap-2 items-center">
@@ -147,12 +142,10 @@ const Profile = () => {
                   <div className="flex justify-between">
                     <div>
                       <h3 className="font-semibold">{listing.title}</h3>
-                      <p className="text-honey font-bold">₹{listing.price}</p>
+                      <p className="font-bold">₹{listing.price}</p>
                     </div>
 
-                    <Badge>
-                      {listing.status || "active"}
-                    </Badge>
+                    <Badge>{listing.status || "active"}</Badge>
                   </div>
 
                   <div className="flex gap-2">

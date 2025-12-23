@@ -5,11 +5,32 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContent";
 
 const MAX_IMAGES = 5;
+
+// ✅ SINGLE SOURCE OF TRUTH FOR CATEGORIES
+const CATEGORIES = [
+  "Tutoring",
+  "Design",
+  "Tech",
+  "Books",
+  "Electronics",
+];
 
 const AddListing = () => {
   const navigate = useNavigate();
@@ -57,6 +78,7 @@ const AddListing = () => {
       data.append("condition", formData.condition);
       data.append("sellerCollegeId", user.collegeId);
       data.append("sellerEmail", user.email);
+      data.append("sellerPhone", user.phone);
 
       images.forEach((img) => data.append("images", img));
 
@@ -108,7 +130,10 @@ const AddListing = () => {
                 <Textarea
                   value={formData.description}
                   onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
+                    setFormData({
+                      ...formData,
+                      description: e.target.value,
+                    })
                   }
                   required
                 />
@@ -126,6 +151,28 @@ const AddListing = () => {
                 />
               </div>
 
+              {/* ✅ CATEGORY SELECT */}
+              <div>
+                <Label>Category</Label>
+                <Select
+                  value={formData.category}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, category: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CATEGORIES.map((cat) => (
+                      <SelectItem key={cat} value={cat}>
+                        {cat}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div>
                 <Label>Images (max 5)</Label>
                 <Input
@@ -136,7 +183,6 @@ const AddListing = () => {
                 />
               </div>
 
-              {/* IMAGE PREVIEW */}
               {images.length > 0 && (
                 <div className="grid grid-cols-3 gap-2">
                   {images.map((img, i) => (

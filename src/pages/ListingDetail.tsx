@@ -4,8 +4,9 @@ import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Mail, Loader2 } from "lucide-react";
+import { ArrowLeft, Mail, Loader2, MessageCircle } from "lucide-react";
 
+/* ================= TYPES ================= */
 interface Listing {
   _id: string;
   title: string;
@@ -15,10 +16,37 @@ interface Listing {
   category?: string;
   createdAt: string;
   sellerEmail?: string;
+  sellerPhone?: string;
   sellerCollegeId?: string;
   status?: string;
 }
 
+/* ================= HELPERS ================= */
+const openWhatsApp = (phone?: string, title?: string) => {
+  if (!phone) {
+    alert("Seller phone number not available");
+    return;
+  }
+
+  const message = encodeURIComponent(
+    `Hi! I'm interested in your listing "${title}" on SellBee 🐝`
+  );
+
+  window.open(`https://wa.me/${phone}?text=${message}`, "_blank");
+};
+
+const sendEmail = (email?: string, title?: string) => {
+  if (!email) return;
+
+  const subject = encodeURIComponent("Interested in your listing on SellBee");
+  const body = encodeURIComponent(
+    `Hi,\n\nI'm interested in your listing "${title}".\n\nThanks!`
+  );
+
+  window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+};
+
+/* ================= COMPONENT ================= */
 const ListingDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -64,6 +92,7 @@ const ListingDetail = () => {
       year: "numeric",
     });
 
+  /* ================= LOADING ================= */
   if (loading) {
     return (
       <div className="min-h-screen bg-background font-fredoka">
@@ -75,6 +104,7 @@ const ListingDetail = () => {
     );
   }
 
+  /* ================= NOT FOUND ================= */
   if (!listing) {
     return (
       <div className="min-h-screen bg-background font-fredoka">
@@ -89,11 +119,13 @@ const ListingDetail = () => {
     );
   }
 
+  /* ================= UI ================= */
   return (
     <div className="min-h-screen bg-background font-fredoka">
       <Navbar />
 
       <div className="container mx-auto px-4 py-8">
+        {/* BACK */}
         <Button
           variant="ghost"
           onClick={() => navigate(-1)}
@@ -104,15 +136,16 @@ const ListingDetail = () => {
         </Button>
 
         <div className="grid lg:grid-cols-2 gap-8">
-          {/* Image Placeholder (future upgrade) */}
+          {/* IMAGE PLACEHOLDER */}
           <div className="aspect-square bg-muted rounded-lg flex items-center justify-center text-8xl">
             📦
           </div>
 
-          {/* Details */}
+          {/* DETAILS */}
           <div className="space-y-6">
+            {/* META */}
             <div>
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex flex-wrap items-center gap-2 mb-2">
                 {listing.category && (
                   <Badge variant="secondary">{listing.category}</Badge>
                 )}
@@ -141,36 +174,63 @@ const ListingDetail = () => {
               </p>
             </div>
 
+            {/* DESCRIPTION */}
             <div>
-              <h2 className="text-lg font-semibold mb-2">Description</h2>
+              <h2 className="text-lg font-semibold mb-2">
+                Description
+              </h2>
               <p className="text-muted-foreground whitespace-pre-wrap">
                 {listing.description || "No description provided"}
               </p>
             </div>
 
-            {/* Seller Contact */}
+            {/* CONTACT SELLER */}
             <Card>
               <CardContent className="p-6">
                 <h2 className="text-lg font-semibold mb-4">
                   Contact Seller
                 </h2>
 
-                {listing.sellerEmail ? (
-                  <a
-                    href={`mailto:${listing.sellerEmail}`}
-                    className="flex items-center gap-2 text-honey hover:underline"
-                  >
-                    <Mail className="h-4 w-4" />
-                    {listing.sellerEmail}
-                  </a>
-                ) : (
-                  <p className="text-muted-foreground text-sm">
+                <div className="flex gap-3 flex-wrap">
+                  {listing.sellerPhone && (
+                    <Button
+                      variant="outline"
+                      onClick={() =>
+                        openWhatsApp(
+                          listing.sellerPhone,
+                          listing.title
+                        )
+                      }
+                    >
+                      <MessageCircle className="h-4 w-4 mr-2" />
+                      WhatsApp
+                    </Button>
+                  )}
+
+                  {listing.sellerEmail && (
+                    <Button
+                      variant="outline"
+                      onClick={() =>
+                        sendEmail(
+                          listing.sellerEmail,
+                          listing.title
+                        )
+                      }
+                    >
+                      <Mail className="h-4 w-4 mr-2" />
+                      Email
+                    </Button>
+                  )}
+                </div>
+
+                {!listing.sellerPhone && !listing.sellerEmail && (
+                  <p className="text-muted-foreground text-sm mt-3">
                     Seller contact not available
                   </p>
                 )}
 
                 {listing.sellerCollegeId && (
-                  <p className="text-sm text-muted-foreground mt-2">
+                  <p className="text-sm text-muted-foreground mt-4">
                     College ID: {listing.sellerCollegeId}
                   </p>
                 )}
