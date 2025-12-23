@@ -3,8 +3,9 @@ import { Button } from "@/components/ui/button";
 import { ShoppingBag, Users, TrendingUp, Shield } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { useAuth } from "@/context/AuthContent";
-import { useState } from "react";
 import TextCursor from "@/components/TextCursor";
+import { useEffect, useState } from "react";
+
 
 
 const Home = () => {
@@ -12,6 +13,26 @@ const Home = () => {
   const isAuthenticated = !!user;
   const [beeActive, setBeeActive] = useState(false);
   const [pauseBee, setPauseBee] = useState(false);
+
+ type Testimonial = {
+  _id: string;
+  name: string;
+  testimonial: string;
+};
+
+const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+useEffect(() => {
+  fetch("http://localhost:5000/users/testimonials")
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("TESTIMONIALS:", data);
+      setTestimonials(data);
+    })
+    .catch(console.error);
+}, []);
+
+
+
 
 
   return (
@@ -108,46 +129,39 @@ const Home = () => {
           </p>
 
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-card border border-border rounded-xl p-6 hover:border-honey transition-all hover:shadow-lg">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="h-12 w-12 rounded-full bg-honey/10 flex items-center justify-center text-xl">👨‍🎓</div>
-                <div>
-                  <h4 className="font-semibold text-base">Rahul K.</h4>
-                  <p className="text-sm text-muted-foreground">Engineering Student</p>
-                </div>
-              </div>
-              <p className="text-base text-muted-foreground leading-relaxed">
-                "Sold my old textbooks in just 2 days! The campus-only marketplace makes it so much safer and convenient."
-              </p>
-            </div>
-
-            <div className="bg-card border border-border rounded-xl p-6 hover:border-honey transition-all hover:shadow-lg">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="h-12 w-12 rounded-full bg-honey/10 flex items-center justify-center text-xl">👩‍💻</div>
-                <div>
-                  <h4 className="font-semibold text-base">Priya S.</h4>
-                  <p className="text-sm text-muted-foreground">Design Student</p>
-                </div>
-              </div>
-              <p className="text-base text-muted-foreground leading-relaxed">
-                "Found amazing deals on electronics from seniors. Love how easy it is to connect with other students!"
-              </p>
-            </div>
-
-            <div className="bg-card border border-border rounded-xl p-6 hover:border-honey transition-all hover:shadow-lg">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="h-12 w-12 rounded-full bg-honey/10 flex items-center justify-center text-xl">👨‍🔬</div>
-                <div>
-                  <h4 className="font-semibold text-base">Arjun M.</h4>
-                  <p className="text-sm text-muted-foreground">MBA Student</p>
-                </div>
-              </div>
-              <p className="text-base text-muted-foreground leading-relaxed">
-                "The skills marketplace helped me find a tutor for my course. Great platform for students helping students!"
-              </p>
-            </div>
+  {testimonials.length === 0 ? (
+    <p className="col-span-3 text-center text-muted-foreground">
+      No testimonials yet.
+    </p>
+  ) : (
+    testimonials.map((item, index) => (
+      <div
+        key={item._id}
+        className="bg-card border border-border rounded-xl p-6 hover:border-honey transition-all hover:shadow-lg"
+      >
+        <div className="flex items-center gap-3 mb-4">
+          <div className="h-12 w-12 rounded-full bg-honey/10 flex items-center justify-center text-xl">
+            👨‍🎓
+          </div>
+          <div>
+            <h4 className="font-semibold text-base">
+              Student Seller
+            </h4>
+            <p className="text-sm text-muted-foreground">
+              Verified Seller
+            </p>
           </div>
         </div>
+
+        <p className="text-base text-muted-foreground leading-relaxed">
+          “{item.testimonial}”
+        </p>
+      </div>
+    ))
+  )}
+  </div>
+</div>
+
       </section>
 
       {/* CTA Section */}
