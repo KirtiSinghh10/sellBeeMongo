@@ -31,8 +31,8 @@ const Auth = () => {
     try {
       const res = await fetch(
         isLogin
-          ? "http://localhost:5000/auth/login"
-          : "http://localhost:5000/auth/signup",
+          ? "http://localhost:8080/auth/login"
+          : "http://localhost:8080/auth/signup",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

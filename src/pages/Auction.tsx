@@ -38,10 +38,75 @@ const Auction = () => {
       .catch(console.error);
   }, []);
 
+type SortOption =
+  | "endingSoon"
+  | "newest"
+  | "priceLow"
+  | "priceHigh"
+  | "mostBids";
+
+type StatusFilter = "all" | "live" | "ended";
+type SellerFilter = "all" | "sameCollege" | "otherCollege";
+
+const [sortBy, setSortBy] = useState<SortOption>("endingSoon");
+const [statusFilter, setStatusFilter] = useState<StatusFilter>("live");
+const [sellerFilter, setSellerFilter] = useState<SellerFilter>("all");
+
+const [minPrice, setMinPrice] = useState<number | "">("");
+const [maxPrice, setMaxPrice] = useState<number | "">("");
+
   /* ================= SEARCH FILTER ================= */
-  const filteredAuctions = auctions.filter((auction) =>
+  const filteredAuctions = auctions
+  // 🔍 Search
+  .filter((auction) =>
     auction.title.toLowerCase().includes(search.toLowerCase())
-  );
+  )
+
+  // ⏱ Status filter
+  .filter((auction) => {
+    if (statusFilter === "all") return true;
+    const ended = new Date(auction.endsAt).getTime() < Date.now();
+    return statusFilter === "live" ? !ended : ended;
+  })
+
+  // 🏫 Seller filter
+  .filter((auction) => {
+    if (sellerFilter === "all" || !user) return true;
+    return sellerFilter === "sameCollege"
+      ? auction.sellerCollegeId === user.collegeId
+      : auction.sellerCollegeId !== user.collegeId;
+  })
+
+  // 💰 Price range
+  .filter((auction) => {
+    if (minPrice !== "" && auction.currentBid < minPrice) return false;
+    if (maxPrice !== "" && auction.currentBid > maxPrice) return false;
+    return true;
+  })
+
+  // ↕ Sorting
+  .sort((a, b) => {
+    switch (sortBy) {
+      case "endingSoon":
+        return (
+          new Date(a.endsAt).getTime() - new Date(b.endsAt).getTime()
+        );
+      case "newest":
+        return (
+          new Date(b.endsAt).getTime() - new Date(a.endsAt).getTime()
+        );
+      case "priceLow":
+        return a.currentBid - b.currentBid;
+      case "priceHigh":
+        return b.currentBid - a.currentBid;
+      case "mostBids":
+        return b.totalBids - a.totalBids;
+      default:
+        return 0;
+    }
+  });
+
+  
 
   /* ================= TIMER (UNCHANGED LOGIC) ================= */
   useEffect(() => {
@@ -83,8 +148,8 @@ const Auction = () => {
     if (!input) return;
 
     const amount = Number(input);
-    if (isNaN(amount)) {
-      alert("Invalid amount");
+    if (isNaN(amount) || amount <= 0) {
+      alert("Enter a valid positive amount");
       return;
     }
 
@@ -140,8 +205,58 @@ const Auction = () => {
             />
           </div>
         </div>
+<div className="grid md:grid-cols-5 gap-4 mt-6">
+  {/* SORT */}
+  <select
+    className="h-9 text-sm bg-[#fffaf3] border-[#f1e6d6] text-muted-foreground px-3 rounded-md focus:outline-none focus:ring-1 focus:ring-honey"
+    value={sortBy}
+    onChange={(e) => setSortBy(e.target.value as SortOption)}
+  >
+    <option value="endingSoon">Ending Soon</option>
+    <option value="newest">Newest</option>
+    <option value="priceLow">Price: Low → High</option>
+    <option value="priceHigh">Price: High → Low</option>
+    <option value="mostBids">Most Bids</option>
+  </select>
+
+  {/* STATUS */}
+  <select
+    className="h-9 text-sm bg-[#fffaf3] border-[#f1e6d6] text-muted-foreground px-3 rounded-md focus:outline-none focus:ring-1 focus:ring-honey"
+    value={statusFilter}
+    onChange={(e) =>
+      setStatusFilter(e.target.value as StatusFilter)
+    }
+  >
+    <option value="live">Live Auctions</option>
+    <option value="ended">Ended Auctions</option>
+    <option value="all">All</option>
+  </select>
+
+
+
+  {/* MIN PRICE */}
+  <Input
+    type="number"
+    placeholder="Min ₹"
+    value={minPrice}
+    onChange={(e) =>
+      setMinPrice(e.target.value ? Number(e.target.value) : "")
+    }
+  />
+
+  {/* MAX PRICE */}
+  <Input
+    type="number"
+    placeholder="Max ₹"
+    value={maxPrice}
+    onChange={(e) =>
+      setMaxPrice(e.target.value ? Number(e.target.value) : "")
+    }
+  />
+</div>
 
         {/* GRID */}
+
         <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredAuctions.map((auction) => {
             const isEnded =

@@ -24,13 +24,23 @@ import { useAuth } from "@/context/AuthContent";
 const MAX_IMAGES = 5;
 
 // ✅ SINGLE SOURCE OF TRUTH FOR CATEGORIES
-const CATEGORIES = [
-  "Tutoring",
-  "Design",
-  "Tech",
-  "Books",
-  "Electronics",
-];
+const CATEGORIES = {
+  Products: [
+    "Clothing",
+    "Electronics",
+    "Furniture",
+    "Sports Equipment",
+    "Textbooks",
+    "Other",
+  ],
+  Services: [
+    "Tutoring",
+    "Design & Creative",
+    "Tech & Development",
+    "Services",
+  ],
+};
+
 
 const AddListing = () => {
   const navigate = useNavigate();
@@ -171,12 +181,27 @@ const AddListing = () => {
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
                   <SelectContent>
-                    {CATEGORIES.map((cat) => (
-                      <SelectItem key={cat} value={cat}>
-                        {cat}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
+  {/* PRODUCTS */}
+  <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">
+    Products
+  </div>
+  {CATEGORIES.Products.map((cat) => (
+    <SelectItem key={cat} value={cat}>
+      {cat}
+    </SelectItem>
+  ))}
+
+  {/* SERVICES */}
+  <div className="px-2 py-1 mt-2 text-xs font-semibold text-muted-foreground">
+    Services
+  </div>
+  {CATEGORIES.Services.map((cat) => (
+    <SelectItem key={cat} value={cat}>
+      {cat}
+    </SelectItem>
+  ))}
+</SelectContent>
+
                 </Select>
               </div>
 
@@ -194,12 +219,27 @@ const AddListing = () => {
                     <SelectValue placeholder="Select condition" />
                   </SelectTrigger>
                   <SelectContent>
-                    {CONDITIONS.map((cond) => (
-                      <SelectItem key={cond} value={cond}>
-                        {cond.replace("-", " ")}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
+  {/* PRODUCTS */}
+  <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">
+    Products
+  </div>
+  {CATEGORIES.Products.map((cat) => (
+    <SelectItem key={cat} value={cat}>
+      {cat}
+    </SelectItem>
+  ))}
+
+  {/* SERVICES */}
+  <div className="px-2 py-1 mt-2 text-xs font-semibold text-muted-foreground">
+    Services
+  </div>
+  {CATEGORIES.Services.map((cat) => (
+    <SelectItem key={cat} value={cat}>
+      {cat}
+    </SelectItem>
+  ))}
+</SelectContent>
+
                 </Select>
               </div>
 
