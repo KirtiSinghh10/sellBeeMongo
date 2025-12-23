@@ -28,6 +28,7 @@ type Product = {
   description: string;
   sellerPhone?: string;
   sellerEmail: string;
+  sellerTestimonial?: string;
   category?: string;
   condition?: "new" | "like-new" | "good" | "fair";
    images?: { url: string }[];

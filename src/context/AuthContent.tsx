@@ -6,6 +6,7 @@ interface User {
   email: string;
   collegeId: string;
   phone: string;
+  testimonial?: string;
 }
 
 interface AuthContextType {

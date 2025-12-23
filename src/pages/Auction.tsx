@@ -21,6 +21,7 @@ type Auction = {
   totalBids: number;
 };
 
+
 /* ================= COMPONENT ================= */
 const Auction = () => {
   const { token, user } = useAuth();
