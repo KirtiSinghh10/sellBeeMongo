@@ -5,8 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Mail, Loader2, MessageCircle } from "lucide-react";
+import ListingImageCarousel from "@/components/ListingImageCarousel";
 
 /* ================= TYPES ================= */
+interface ListingImage {
+  url: string;
+}
+
 interface Listing {
   _id: string;
   title: string;
@@ -19,6 +24,7 @@ interface Listing {
   sellerPhone?: string;
   sellerCollegeId?: string;
   status?: string;
+  images?: ListingImage[];
 }
 
 /* ================= HELPERS ================= */
@@ -60,10 +66,7 @@ const ListingDetail = () => {
     const fetchListing = async () => {
       try {
         const res = await fetch(`http://localhost:5000/products/${id}`);
-
-        if (!res.ok) {
-          throw new Error("Listing not found");
-        }
+        if (!res.ok) throw new Error("Listing not found");
 
         const data = await res.json();
         setListing(data);
@@ -136,10 +139,8 @@ const ListingDetail = () => {
         </Button>
 
         <div className="grid lg:grid-cols-2 gap-8">
-          {/* IMAGE PLACEHOLDER */}
-          <div className="aspect-square bg-muted rounded-lg flex items-center justify-center text-8xl">
-            📦
-          </div>
+          {/* ✅ IMAGE CAROUSEL */}
+          <ListingImageCarousel images={listing.images || []} />
 
           {/* DETAILS */}
           <div className="space-y-6">
@@ -152,7 +153,7 @@ const ListingDetail = () => {
 
                 {listing.condition && (
                   <Badge variant="outline" className="capitalize">
-                    {listing.condition}
+                    {listing.condition.replace("-", " ")}
                   </Badge>
                 )}
 

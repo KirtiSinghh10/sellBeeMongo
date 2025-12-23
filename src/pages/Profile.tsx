@@ -107,7 +107,7 @@ const Profile = () => {
             <p><strong>Name:</strong> {user.name}</p>
             <p><strong>Email:</strong> {user.email}</p>
             <p><strong>College ID:</strong> {user.collegeId}</p>
-            {user.phone && <p><strong>Phone:</strong> {user.phone}</p>}
+            <p><strong>Phone Number:</strong> {user.phone}</p>
 
             <Button
               variant="outline"

@@ -44,8 +44,15 @@ const AddListing = () => {
     description: "",
     price: "",
     category: "",
-    condition: "good",
+    condition: "",
   });
+
+  const CONDITIONS = [
+  "new",
+  "like-new",
+  "good",
+  "fair",
+];
 
   useEffect(() => {
     if (!user) navigate("/auth");
@@ -151,7 +158,7 @@ const AddListing = () => {
                 />
               </div>
 
-              {/* ✅ CATEGORY SELECT */}
+              {/* CATEGORY */}
               <div>
                 <Label>Category</Label>
                 <Select
@@ -167,6 +174,29 @@ const AddListing = () => {
                     {CATEGORIES.map((cat) => (
                       <SelectItem key={cat} value={cat}>
                         {cat}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              
+              {/* ✅ CONDITION (FIXED) */}
+              <div>
+                <Label>Condition</Label>
+                <Select
+                  value={formData.condition}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, condition: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select condition" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CONDITIONS.map((cond) => (
+                      <SelectItem key={cond} value={cond}>
+                        {cond.replace("-", " ")}
                       </SelectItem>
                     ))}
                   </SelectContent>

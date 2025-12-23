@@ -21,38 +21,38 @@ const EditProfile = () => {
   };
 
   const handleSubmit = async () => {
-    if (!token) {
-      toast.error("Not authenticated");
-      return;
-    }
+  if (!token) {
+    toast.error("Not authenticated");
+    return;
+  }
 
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      const res = await fetch("http://localhost:5000/users/me", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          phone: formData.phone,
-        }),
-      });
+    const res = await fetch("http://localhost:5000/users/me", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        name: formData.name,
+        phone: formData.phone,
+      }),
+    });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message);
 
-      setUser(data); // 🔥 update global auth state
-      toast.success("Profile updated successfully");
-      navigate("/profile");
-    } catch (err: any) {
-      toast.error(err.message || "Update failed");
-    } finally {
-      setLoading(false);
-    }
-  };
+    setUser(data.user); // 🔥 FIXED
+    toast.success("Profile updated successfully");
+    navigate("/profile");
+  } catch (err: any) {
+    toast.error(err.message || "Update failed");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">

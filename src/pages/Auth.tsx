@@ -17,6 +17,7 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [collegeId, setCollegeId] = useState("");
+  const [phone, setphone]=useState("");
 
   const [loading, setLoading] = useState(false);
 
@@ -38,7 +39,7 @@ const Auth = () => {
           body: JSON.stringify(
             isLogin
               ? { email, password }
-              : { name, email, password, collegeId }
+              : { name, email, password, collegeId, phone }
           ),
         }
       );
@@ -78,6 +79,13 @@ const Auth = () => {
                   onChange={(e) => setName(e.target.value)}
                   required
                 />
+
+                <Input
+              placeholder="Phone Number"
+              value={phone}
+              onChange={(e) => setphone(e.target.value)}
+              required
+            />
 
                 <Input
                   placeholder="College ID"

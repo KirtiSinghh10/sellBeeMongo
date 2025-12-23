@@ -26,10 +26,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.getItem("token")
   );
 
-  const setUser = (userData: User) => {
-    setUserState(userData);
-    localStorage.setItem("user", JSON.stringify(userData));
+  const setUser = (userData: any) => {
+  const normalizedUser = {
+    id: userData.id || userData._id,
+    name: userData.name,
+    email: userData.email,
+    collegeId: userData.collegeId,
+    phone: userData.phone,
   };
+
+  setUserState(normalizedUser);
+  localStorage.setItem("user", JSON.stringify(normalizedUser));
+};
+
 
   const login = (userData: User, token: string) => {
     setUser(userData);
