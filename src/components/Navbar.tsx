@@ -13,7 +13,7 @@ const Navbar = () => {
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
           <div className="text-4xl">🐝</div>
-          <span className="text-3xl font-bold">
+          <span className="text-4xl font-story font-bold">
     <span className="text- Black">
       Sell
     </span>

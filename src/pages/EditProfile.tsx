@@ -12,7 +12,6 @@ const EditProfile = () => {
   const [formData, setFormData] = useState({
     name: user?.name || "",
     phone: user?.phone || "",
-    testimonial: user?.testimonial || "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -39,7 +38,7 @@ const EditProfile = () => {
       body: JSON.stringify({
         name: formData.name,
         phone: formData.phone,
-        testimonal: formData.testimonial,
+
       }),
     });
 
@@ -74,26 +73,6 @@ const EditProfile = () => {
           onChange={handleChange}
           placeholder="Phone"
         />
-
-        <div className="space-y-1">
-  <label className="text-sm font-medium">Testimonial</label>
-
-  <textarea
-    name="testimonial"
-    value={formData.testimonial}
-    onChange={(e) =>
-      setFormData({ ...formData, testimonial: e.target.value })
-    }
-    placeholder="Write a short testimonial about your SellBee experience..."
-    maxLength={300}
-    className="w-full border rounded-md p-2 resize-none"
-    rows={4}
-  />
-
-  <p className="text-xs text-muted-foreground text-right">
-    {formData.testimonial.length}/300
-  </p>
-</div>
 
 
         <Button onClick={handleSubmit} disabled={loading}>

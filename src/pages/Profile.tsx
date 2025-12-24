@@ -4,15 +4,21 @@ import Navbar from "@/components/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { User, Package, Edit } from "lucide-react";
 import { useAuth } from "@/context/AuthContent";
+import { toast } from "sonner";
 
 const Profile = () => {
-  const { user, token } = useAuth();
+  const { user, token, setUser } = useAuth();
   const navigate = useNavigate();
 
   const [myListings, setMyListings] = useState<any[]>([]);
   const [loadingListings, setLoadingListings] = useState(true);
+
+  // 🆕 testimonial state
+  const [testimonial, setTestimonial] = useState(user?.testimonial || "");
+  const [savingTestimonial, setSavingTestimonial] = useState(false);
 
   // 🔐 Redirect if not logged in
   useEffect(() => {
@@ -40,7 +46,7 @@ const Profile = () => {
     fetchMyListings();
   }, [user]);
 
-  // 🗑️ DELETE
+  // 🗑️ DELETE LISTING
   const deleteListing = async (id: string) => {
     if (!token) return;
     if (!confirm("Delete this listing?")) return;
@@ -85,6 +91,46 @@ const Profile = () => {
     }
   };
 
+  // 🆕 SAVE TESTIMONIAL
+  const saveTestimonial = async () => {
+    if (!token) return;
+
+    if (!testimonial || testimonial.trim() === "") {
+      toast.error("Testimonial cannot be empty");
+      return;
+    }
+
+    if (testimonial.length > 300) {
+      toast.error("Max 300 characters allowed");
+      return;
+    }
+
+    try {
+      setSavingTestimonial(true);
+
+      const res = await fetch("http://localhost:5000/users/testimonial", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ testimonial }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+
+      // ✅ update global user
+      setUser({ ...user, testimonial: data.testimonial });
+
+      toast.success("Testimonial saved");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to save testimonial");
+    } finally {
+      setSavingTestimonial(false);
+    }
+  };
+
   if (!user) return null;
 
   return (
@@ -94,7 +140,7 @@ const Profile = () => {
       <div className="container mx-auto px-4 py-8 max-w-4xl space-y-8">
         <h1 className="text-4xl font-bold">My Profile</h1>
 
-        {/* PROFILE CARD */}
+        {/* PROFILE INFO */}
         <Card>
           <CardHeader>
             <CardTitle className="flex gap-2 items-center">
@@ -116,6 +162,35 @@ const Profile = () => {
               <Edit className="h-4 w-4 mr-2" />
               Edit Profile
             </Button>
+          </CardContent>
+        </Card>
+
+        {/* 🆕 TESTIMONIAL */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Your Testimonial</CardTitle>
+          </CardHeader>
+
+          <CardContent className="space-y-3">
+            <Textarea
+              placeholder="Share your experience with SellBee (max 300 characters)"
+              value={testimonial}
+              onChange={(e) => setTestimonial(e.target.value)}
+              maxLength={300}
+            />
+
+            <div className="flex justify-between items-center">
+              <p className="text-sm text-muted-foreground">
+                {testimonial.length}/300 characters
+              </p>
+
+              <Button
+                onClick={saveTestimonial}
+                disabled={savingTestimonial}
+              >
+                {savingTestimonial ? "Saving..." : "Save Testimonial"}
+              </Button>
+            </div>
           </CardContent>
         </Card>
 

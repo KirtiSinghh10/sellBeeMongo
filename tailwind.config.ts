@@ -1,4 +1,6 @@
 import type { Config } from "tailwindcss";
+import animate from "tailwindcss-animate";
+
 
 export default {
   darkMode: ["class"],
@@ -16,6 +18,9 @@ export default {
       fontFamily: {
         'heading': ['Avenir Next', 'Avenir', 'system-ui', 'sans-serif'],
         'sans': ['Montserrat', 'system-ui', 'sans-serif'],
+         sekuya: ["Sekuya", "sans-serif"],
+         story: ['"Story Script"', 'cursive'],
+         sigmar: ["Sigmar One", "cursive"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -96,5 +101,6 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [animate],
+
 } satisfies Config;
