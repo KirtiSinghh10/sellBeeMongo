@@ -123,13 +123,14 @@ const Home = () => {
       <section className="container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-4 text-black">
-            Skills & Services Offered
+            Skills & Services 
+             <span className="text-yellow-400 mb-5"> Offered </span>
           </h2>
-
-          <div className="bg-card border border-border rounded-2xl p-8 shadow-lg">
-            <p className="text-center text-muted-foreground mb-6">
+          <p className="text-center text-muted-foreground mb-6">
               Connect with talented students offering various skills and services
             </p>
+          <div className="bg-card border border-border rounded-2xl p-8 shadow-lg">
+      
 
             <div className="grid md:grid-cols-3 gap-5">
               <Link to="/marketplace?category=Tutoring">
@@ -168,11 +169,16 @@ const Home = () => {
       </section>
 
       {/* ================= FEATURES ================= */}
-      <section className="container mx-auto px-4 py-16">
-         <h2 className="text-3xl font-bold text-center mb-4 text-black">
-            Why choose SellBee?
-          </h2>
-          <p className="text-base text-center text-muted-foreground mb-12">
+      <section className="container mx-auto px-4 py-12">
+         <h2 className="text-4xl font-bold text-center mb-2 text-black">
+  Why choose{" "}
+  <span className="font-story">
+    <span className="text-black mb-5">Sell</span>
+    <span className="text-yellow-400 mb-5">Bee </span>
+  </span>
+  ?
+</h2>
+          <p className="text-base text-center text-muted-foreground mt-1 mb-12">
             Everything you need for campus trading
           </p>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">

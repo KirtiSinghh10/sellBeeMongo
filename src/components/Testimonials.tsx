@@ -32,7 +32,8 @@ const Testimonials = () => {
   return (
     <section className="py-12">
       <h2 className="text-3xl font-bold text-center mb-3">
-        What Students Say
+        What Students 
+        <span className="text-yellow-400 mb-5"> Say </span>
       </h2>
 
        <p className="text-base text-center text-muted-foreground mb-12">
