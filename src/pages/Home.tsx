@@ -27,7 +27,7 @@ const Home = () => {
   relative
   max-w-7xl
   mx-auto
-  bg-gradient-to-br from-honey/30 via-honey/5 to-pastel-lavender/10
+  bg-gradient-to-br from-honey/50 via-honey/5 to-pastel-lavender/10
   rounded-3xl
   p-16
   text-center

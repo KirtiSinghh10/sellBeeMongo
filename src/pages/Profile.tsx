@@ -32,7 +32,7 @@ const Profile = () => {
     const fetchMyListings = async () => {
       try {
         const res = await fetch(
-          `http://localhost:5000/products/mine/${user.collegeId}`
+          `https://sellbee-backend-7gny.onrender.com/products/mine/${user.collegeId}`
         );
         const data = await res.json();
         setMyListings(data);
@@ -52,7 +52,7 @@ const Profile = () => {
     if (!confirm("Delete this listing?")) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/products/${id}`, {
+      const res = await fetch(`https://sellbee-backend-7gny.onrender.com/products/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -73,7 +73,7 @@ const Profile = () => {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/products/${id}/sold`,
+        `https://sellbee-backend-7gny.onrender.com/products/${id}/sold`,
         {
           method: "PATCH",
           headers: {
@@ -108,7 +108,7 @@ const Profile = () => {
     try {
       setSavingTestimonial(true);
 
-      const res = await fetch("http://localhost:5000/users/testimonial", {
+      const res = await fetch("https://sellbee-backend-7gny.onrender.com/users/testimonial", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

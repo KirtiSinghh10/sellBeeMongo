@@ -31,8 +31,8 @@ const Auth = () => {
     try {
       const res = await fetch(
         isLogin
-          ?"http://localhost:5000/auth/login"
-    : "http://localhost:5000/auth/signup",
+          ?"https://sellbee-backend-7gny.onrender.com/auth/login"
+    : "https://sellbee-backend-7gny.onrender.com/auth/signup",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

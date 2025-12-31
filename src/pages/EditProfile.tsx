@@ -29,7 +29,7 @@ const EditProfile = () => {
   try {
     setLoading(true);
 
-    const res = await fetch("http://localhost:5000/users/me", {
+    const res = await fetch("https://sellbee-backend-7gny.onrender.com/users/me", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

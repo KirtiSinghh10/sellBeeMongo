@@ -80,7 +80,7 @@ const Marketplace = () => {
 
   /* ================= FETCH ================= */
   useEffect(() => {
-    fetch("http://localhost:5000/products")
+    fetch("https://sellbee-backend-7gny.onrender.com/products")
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch products");
         return res.json();

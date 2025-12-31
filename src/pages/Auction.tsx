@@ -32,7 +32,7 @@ const Auction = () => {
 
   /* ================= FETCH AUCTIONS ================= */
   useEffect(() => {
-    fetch("http://localhost:5000/products/auction/all")
+    fetch("https://sellbee-backend-7gny.onrender.com/products/auction/all")
 
       .then((res) => res.json())
       .then(setAuctions)
@@ -156,7 +156,7 @@ const [maxPrice, setMaxPrice] = useState<number | "">("");
 
     try {
       const res = await fetch(
-        `http://localhost:5000/auction/${auctionId}/bid`,
+        "https://sellbee-backend-7gny.onrender.com/auction/${auctionId}/bid",
         {
           method: "POST",
           headers: {
