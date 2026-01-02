@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Mail, Loader2, MessageCircle } from "lucide-react";
 import ListingImageCarousel from "@/components/ListingImageCarousel";
-const API = import.meta.env.VITE_API_URL;
+import { API_URL } from "@/config/api";
 
 
 /* ================= TYPES ================= */
@@ -67,7 +67,7 @@ const ListingDetail = () => {
 
     const fetchListing = async () => {
       try {
-        const res = await fetch(`${API}/products/${id}`);
+        const res = await fetch(`${API_URL}/products/${id}`);
         if (!res.ok) throw new Error("Listing not found");
 
         const data = await res.json();
