@@ -88,7 +88,7 @@ const Auth = () => {
             />
 
                 <Input
-                  placeholder="College ID"
+                  placeholder="USN"
                   value={collegeId}
                   onChange={(e) => setCollegeId(e.target.value)}
                   required
