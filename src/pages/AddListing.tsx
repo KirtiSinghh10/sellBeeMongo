@@ -52,6 +52,9 @@ const AddListing = () => {
   const [loading, setLoading] = useState(false);
   const [images, setImages] = useState<File[]>([]);
 
+  // 🔹 NEW: negotiable state
+  const [isNegotiable, setIsNegotiable] = useState(true);
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -92,6 +95,10 @@ const AddListing = () => {
       data.append("price", formData.price);
       data.append("category", formData.category);
       data.append("condition", formData.condition);
+
+      // 🔹 NEW: send negotiable flag
+      data.append("isNegotiable", String(isNegotiable));
+
       data.append("sellerCollegeId", user.collegeId);
       data.append("sellerEmail", user.email);
       data.append("sellerPhone", user.phone);
@@ -166,6 +173,36 @@ const AddListing = () => {
                   }
                   required
                 />
+              </div>
+
+              {/* 🔹 NEW: NEGOTIABLE TOGGLE */}
+              <div>
+                <Label>Price Type</Label>
+                <div className="flex gap-3 mt-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsNegotiable(true)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+                      isNegotiable
+                        ? "bg-green-500 text-white"
+                        : "bg-gray-200 text-gray-700"
+                    }`}
+                  >
+                    Negotiable
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsNegotiable(false)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+                      !isNegotiable
+                        ? "bg-red-500 text-white"
+                        : "bg-gray-200 text-gray-700"
+                    }`}
+                  >
+                    Non-Negotiable
+                  </button>
+                </div>
               </div>
 
               {/* CATEGORY */}

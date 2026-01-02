@@ -31,7 +31,10 @@ type Product = {
   sellerTestimonial?: string;
   category?: string;
   condition?: "new" | "like-new" | "good" | "fair";
-   images?: { url: string }[];
+  images?: { url: string }[];
+
+  // 🔹 NEW (safe)
+  isNegotiable?: boolean;
 };
 
 /* ================= HELPERS ================= */
@@ -126,7 +129,6 @@ const Marketplace = () => {
 
           {/* SEARCH + FILTERS */}
           <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
-            {/* SEARCH (LEFT) */}
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -137,9 +139,7 @@ const Marketplace = () => {
               />
             </div>
 
-            {/* FILTERS (RIGHT) */}
             <div className="flex gap-2 ml-auto flex-wrap">
-              {/* CATEGORY */}
               <Select value={category} onValueChange={setCategory}>
                 <SelectTrigger className="w-[160px]">
                   <SelectValue placeholder="Category" />
@@ -153,7 +153,6 @@ const Marketplace = () => {
                 </SelectContent>
               </Select>
 
-              {/* PRICE */}
               <Select value={priceRange} onValueChange={setPriceRange}>
                 <SelectTrigger className="w-[160px]">
                   <SelectValue placeholder="Price" />
@@ -166,7 +165,6 @@ const Marketplace = () => {
                 </SelectContent>
               </Select>
 
-              {/* CONDITION */}
               <Select value={condition} onValueChange={setCondition}>
                 <SelectTrigger className="w-[160px]">
                   <SelectValue placeholder="Condition" />
@@ -209,26 +207,65 @@ const Marketplace = () => {
                     navigate(`/listing/${product._id}`);
                   }
                 }}
-                className="cursor-pointer hover:shadow-lg transition-shadow"
+                className={`cursor-pointer transition hover:shadow-lg border ${
+                  product.category === "Services"
+                    ? "bg-blue-50 border-blue-200"
+                    : "bg-yellow-50 border-yellow-200"
+                }`}
               >
+                {/* TOP STRIP */}
+                <div
+                  className={`h-1 w-full ${
+                    product.category === "Services"
+                      ? "bg-blue-400"
+                      : "bg-yellow-400"
+                  }`}
+                />
+
                 {product.images?.[0]?.url ? (
-  <img
-    src={product.images[0].url}
-    alt={product.title}
-    className="h-40 w-full object-cover rounded-t"
-  />
-) : (
-  <div className="h-40 flex items-center justify-center bg-muted text-4xl">
-    📦
-  </div>
-)}
+                  <img
+                    src={product.images[0].url}
+                    alt={product.title}
+                    className="h-40 w-full object-cover"
+                  />
+                ) : (
+                  <div className="h-40 flex items-center justify-center bg-muted text-4xl">
+                    📦
+                  </div>
+                )}
+
                 <CardHeader>
-                  <h3 className="text-xl font-bold">
-                    {product.title}
-                  </h3>
-                  <Badge className="w-fit mt-2">
-                    ₹{product.price}
-                  </Badge>
+                  <h3 className="text-xl font-bold">{product.title}</h3>
+
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    <Badge variant="secondary">
+                      ₹{product.price}
+                    </Badge>
+
+                    <Badge
+                      className={
+                        product.isNegotiable
+                          ? "bg-green-100 text-green-700"
+                          : "bg-red-100 text-red-700"
+                      }
+                    >
+                      {product.isNegotiable
+                        ? "Negotiable"
+                        : "Non-Negotiable"}
+                    </Badge>
+
+                    <Badge
+                      className={
+                        product.category === "Services"
+                          ? "bg-blue-100 text-blue-800"
+                          : "bg-yellow-100 text-yellow-800"
+                      }
+                    >
+                      {product.category === "Services"
+                        ? "Service"
+                        : "Product"}
+                    </Badge>
+                  </div>
                 </CardHeader>
 
                 <CardContent>
