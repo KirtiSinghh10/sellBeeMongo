@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Navbar from "@/components/Navbar";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,15 +11,18 @@ type Auction = {
   title: string;
   originalPrice: number;
   currentBid: number;
+  category?: string;
   images?: { url: string }[];
-  endsAt: string; // 🔑 MUST come from backend
+  endsAt: string;
   sellerCollegeId: string;
 };
 
 const Auction = () => {
   const { user, token } = useAuth();
+
   const [auctions, setAuctions] = useState<Auction[]>([]);
   const [bidAmounts, setBidAmounts] = useState<Record<string, string>>({});
+  const [search, setSearch] = useState("");
   const [now, setNow] = useState(Date.now());
 
   /* ================= FETCH LIVE AUCTIONS ================= */
@@ -30,45 +33,44 @@ const Auction = () => {
       .catch(() => toast.error("Failed to load auctions"));
   }, []);
 
-  /* ================= TICK EVERY MINUTE ================= */
+  /* ================= TIMER TICK ================= */
   useEffect(() => {
-    const interval = setInterval(() => {
-      setNow(Date.now());
-    }, 60 * 1000);
-
-    return () => clearInterval(interval);
+    const t = setInterval(() => setNow(Date.now()), 60 * 1000);
+    return () => clearInterval(t);
   }, []);
 
-  /* ================= TIMER ================= */
+  /* ================= SEARCH FILTER ================= */
+  const filteredAuctions = useMemo(() => {
+    return auctions.filter((a) =>
+      `${a.title} ${a.category ?? ""}`
+        .toLowerCase()
+        .includes(search.toLowerCase())
+    );
+  }, [auctions, search]);
+
+  /* ================= TIME LEFT ================= */
   const getTimeLeft = (endsAt: string) => {
     const diff = new Date(endsAt).getTime() - now;
-
     if (diff <= 0) return "Ended";
 
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const m = Math.floor((diff / (1000 * 60)) % 60);
 
-    return `${days}d ${hours}h ${minutes}m`;
+    return `${d}d ${h}h ${m}m`;
   };
 
   /* ================= PLACE BID ================= */
-  const placeBid = async (auctionId: string, currentBid: number) => {
-    if (!token) {
-      toast.error("Login required");
-      return;
-    }
+  const placeBid = async (id: string, currentBid: number) => {
+    const amount = Number(bidAmounts[id]);
 
-    const amount = Number(bidAmounts[auctionId]);
-
-    if (!amount || amount < currentBid + 10) {
-      toast.error(`Minimum bid is ₹${currentBid + 10}`);
-      return;
-    }
+    if (!token) return toast.error("Login required");
+    if (!amount || amount < currentBid + 10)
+      return toast.error(`Minimum bid is ₹${currentBid + 10}`);
 
     try {
       const res = await fetch(
-        `https://sellbee-backend-7gny.onrender.com/auction/${auctionId}/bid`,
+        `https://sellbee-backend-7gny.onrender.com/auction/${id}/bid`,
         {
           method: "POST",
           headers: {
@@ -82,17 +84,16 @@ const Auction = () => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
 
-      toast.success("Bid placed!");
+      toast.success("Bid placed");
 
       setAuctions((prev) =>
         prev.map((a) =>
-          a._id === auctionId ? { ...a, currentBid: amount } : a
+          a._id === id ? { ...a, currentBid: amount } : a
         )
       );
-
-      setBidAmounts((prev) => ({ ...prev, [auctionId]: "" }));
-    } catch (err: any) {
-      toast.error(err.message || "Bid failed");
+      setBidAmounts((p) => ({ ...p, [id]: "" }));
+    } catch (e: any) {
+      toast.error(e.message || "Bid failed");
     }
   };
 
@@ -101,28 +102,33 @@ const Auction = () => {
       <Navbar />
 
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold mb-8">Live Auctions</h1>
+        <h1 className="text-4xl font-bold mb-6">Live Auctions</h1>
 
-        {auctions.length === 0 ? (
-          <p className="text-muted-foreground text-center">
-            No live auctions right now
-          </p>
+        {/* SEARCH */}
+        <Input
+          placeholder="Search auctions..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="max-w-md mb-6"
+        />
+
+        {filteredAuctions.length === 0 ? (
+          <p className="text-muted-foreground">No auctions found</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {auctions.map((auction) => {
-              const isEnded =
-                new Date(auction.endsAt).getTime() <= now;
-
-              if (isEnded) return null; // 🔥 DO NOT RENDER ENDED
+            {filteredAuctions.map((a) => {
+              const ended =
+                new Date(a.endsAt).getTime() <= now;
+              if (ended) return null;
 
               const isSeller =
-                user?.collegeId === auction.sellerCollegeId;
+                user?.collegeId === a.sellerCollegeId;
 
               return (
-                <Card key={auction._id}>
-                  {auction.images?.[0]?.url ? (
+                <Card key={a._id}>
+                  {a.images?.[0]?.url ? (
                     <img
-                      src={auction.images[0].url}
+                      src={a.images[0].url}
                       className="h-40 w-full object-cover rounded-t"
                     />
                   ) : (
@@ -132,40 +138,35 @@ const Auction = () => {
                   )}
 
                   <CardHeader>
-                    <h3 className="text-xl font-bold">{auction.title}</h3>
+                    <h3 className="text-xl font-bold">{a.title}</h3>
                     <p className="text-sm text-muted-foreground">
-                      Ends in: {getTimeLeft(auction.endsAt)}
+                      Ends in: {getTimeLeft(a.endsAt)}
                     </p>
                   </CardHeader>
 
                   <CardContent className="space-y-3">
-                    <p>
-                      Base Price: ₹{auction.originalPrice}
-                    </p>
+                    <p>Base Price: ₹{a.originalPrice}</p>
                     <p className="font-semibold">
-                      Current Bid: ₹{auction.currentBid}
+                      Current Bid: ₹{a.currentBid}
                     </p>
 
                     {!isSeller && (
                       <>
                         <Input
                           type="number"
-                          placeholder={`Min ₹${auction.currentBid + 10}`}
-                          value={bidAmounts[auction._id] || ""}
+                          placeholder={`Min ₹${a.currentBid + 10}`}
+                          value={bidAmounts[a._id] || ""}
                           onChange={(e) =>
                             setBidAmounts({
                               ...bidAmounts,
-                              [auction._id]: e.target.value,
+                              [a._id]: e.target.value,
                             })
                           }
                         />
                         <Button
                           className="w-full"
                           onClick={() =>
-                            placeBid(
-                              auction._id,
-                              auction.currentBid
-                            )
+                            placeBid(a._id, a.currentBid)
                           }
                         >
                           Place Bid
