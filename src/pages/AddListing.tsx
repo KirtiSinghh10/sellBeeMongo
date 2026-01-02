@@ -20,10 +20,11 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContent";
+import { API_URL } from "@/config/api";
 
 const MAX_IMAGES = 5;
 
-// ✅ SINGLE SOURCE OF TRUTH FOR CATEGORIES
+/* ================= CATEGORIES ================= */
 const CATEGORIES = {
   Products: [
     "Clothing",
@@ -41,6 +42,8 @@ const CATEGORIES = {
   ],
 };
 
+/* ================= CONDITIONS ================= */
+const CONDITIONS = ["new", "like-new", "good", "fair"];
 
 const AddListing = () => {
   const navigate = useNavigate();
@@ -57,17 +60,12 @@ const AddListing = () => {
     condition: "",
   });
 
-  const CONDITIONS = [
-  "new",
-  "like-new",
-  "good",
-  "fair",
-];
-
+  /* ================= AUTH GUARD ================= */
   useEffect(() => {
     if (!user) navigate("/auth");
   }, [user, navigate]);
 
+  /* ================= IMAGE HANDLER ================= */
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
 
@@ -80,6 +78,7 @@ const AddListing = () => {
     setImages(selected);
   };
 
+  /* ================= SUBMIT ================= */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !token) return;
@@ -99,7 +98,7 @@ const AddListing = () => {
 
       images.forEach((img) => data.append("images", img));
 
-      const res = await fetch("http://localhost:5000/products/add", {
+      const res = await fetch(`${API_URL}/products/add`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -119,6 +118,7 @@ const AddListing = () => {
     }
   };
 
+  /* ================= UI ================= */
   return (
     <div className="min-h-screen bg-background font-fredoka">
       <Navbar />
@@ -181,32 +181,28 @@ const AddListing = () => {
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
                   <SelectContent>
-  {/* PRODUCTS */}
-  <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">
-    Products
-  </div>
-  {CATEGORIES.Products.map((cat) => (
-    <SelectItem key={cat} value={cat}>
-      {cat}
-    </SelectItem>
-  ))}
+                    <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">
+                      Products
+                    </div>
+                    {CATEGORIES.Products.map((cat) => (
+                      <SelectItem key={cat} value={cat}>
+                        {cat}
+                      </SelectItem>
+                    ))}
 
-  {/* SERVICES */}
-  <div className="px-2 py-1 mt-2 text-xs font-semibold text-muted-foreground">
-    Services
-  </div>
-  {CATEGORIES.Services.map((cat) => (
-    <SelectItem key={cat} value={cat}>
-      {cat}
-    </SelectItem>
-  ))}
-</SelectContent>
-
+                    <div className="px-2 py-1 mt-2 text-xs font-semibold text-muted-foreground">
+                      Services
+                    </div>
+                    {CATEGORIES.Services.map((cat) => (
+                      <SelectItem key={cat} value={cat}>
+                        {cat}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
               </div>
 
-              
-              {/* ✅ CONDITION (FIXED) */}
+              {/* CONDITION */}
               <div>
                 <Label>Condition</Label>
                 <Select
@@ -219,27 +215,12 @@ const AddListing = () => {
                     <SelectValue placeholder="Select condition" />
                   </SelectTrigger>
                   <SelectContent>
-  {/* PRODUCTS */}
-  <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">
-    Products
-  </div>
-  {CATEGORIES.Products.map((cat) => (
-    <SelectItem key={cat} value={cat}>
-      {cat}
-    </SelectItem>
-  ))}
-
-  {/* SERVICES */}
-  <div className="px-2 py-1 mt-2 text-xs font-semibold text-muted-foreground">
-    Services
-  </div>
-  {CATEGORIES.Services.map((cat) => (
-    <SelectItem key={cat} value={cat}>
-      {cat}
-    </SelectItem>
-  ))}
-</SelectContent>
-
+                    {CONDITIONS.map((cond) => (
+                      <SelectItem key={cond} value={cond}>
+                        {cond.replace("-", " ")}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
               </div>
 
