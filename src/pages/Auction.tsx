@@ -155,17 +155,18 @@ const [maxPrice, setMaxPrice] = useState<number | "">("");
     }
 
     try {
-      const res = await fetch(
-        "https://sellbee-backend-7gny.onrender.com/auction/${auctionId}/bid",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ amount }),
-        }
-      );
+     const res = await fetch(
+  `https://sellbee-backend-7gny.onrender.com/auction/${auctionId}/bid`,
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ amount }),
+  }
+);
+
 
       const data = await res.json();
 
