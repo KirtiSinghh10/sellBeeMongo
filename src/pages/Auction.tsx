@@ -76,56 +76,65 @@ const AuctionPage = () => {
 
   /* ================= FILTER + SORT ================= */
   const filteredAuctions = auctions
-    // 🔍 Search
-    .filter((a) =>
-      a.title.toLowerCase().includes(search.toLowerCase())
-    )
+  /* 🔍 SEARCH */
+  .filter((auction) =>
+    auction.title.toLowerCase().includes(search.toLowerCase())
+  )
 
-    // ⏱ Status
-    .filter((a) => {
-      if (statusFilter === "all") return true;
-      const ended = new Date(a.endsAt).getTime() <= now;
-      return statusFilter === "live" ? !ended : ended;
-    })
+  /* ⏱ STATUS FILTER */
+  .filter((auction) => {
+    if (statusFilter === "all") return true;
 
-    // 🏫 Seller
-    .filter((a) => {
-      if (sellerFilter === "all" || !user) return true;
-      return sellerFilter === "sameCollege"
-        ? a.sellerCollegeId === user.collegeId
-        : a.sellerCollegeId !== user.collegeId;
-    })
+    const ended =
+      new Date(auction.endsAt).getTime() <= Date.now();
 
-    // 💰 Price range
-    .filter((a) => {
-      if (minPrice !== "" && a.currentBid < minPrice) return false;
-      if (maxPrice !== "" && a.currentBid > maxPrice) return false;
-      return true;
-    })
+    return statusFilter === "live" ? !ended : ended;
+  })
 
-    // ↕ Sorting
-    .sort((a, b) => {
-      switch (sortBy) {
-        case "endingSoon":
-          return (
-            new Date(a.endsAt).getTime() -
-            new Date(b.endsAt).getTime()
-          );
-        case "newest":
-          return (
-            new Date(b.endsAt).getTime() -
-            new Date(a.endsAt).getTime()
-          );
-        case "priceLow":
-          return a.currentBid - b.currentBid;
-        case "priceHigh":
-          return b.currentBid - a.currentBid;
-        case "mostBids":
-          return (b.totalBids ?? 0) - (a.totalBids ?? 0);
-        default:
-          return 0;
-      }
-    });
+  /* 🏫 SELLER FILTER */
+  .filter((auction) => {
+    if (sellerFilter === "all" || !user) return true;
+
+    return sellerFilter === "sameCollege"
+      ? auction.sellerCollegeId === user.collegeId
+      : auction.sellerCollegeId !== user.collegeId;
+  })
+
+  /* 💰 PRICE RANGE */
+  .filter((auction) => {
+    if (minPrice !== "" && auction.currentBid < minPrice) return false;
+    if (maxPrice !== "" && auction.currentBid > maxPrice) return false;
+    return true;
+  })
+
+  /* ↕ SORTING */
+  .sort((a, b) => {
+    switch (sortBy) {
+      case "endingSoon":
+        return (
+          new Date(a.endsAt).getTime() -
+          new Date(b.endsAt).getTime()
+        );
+
+      case "newest":
+        return (
+          new Date(b.endsAt).getTime() -
+          new Date(a.endsAt).getTime()
+        );
+
+      case "priceLow":
+        return a.currentBid - b.currentBid;
+
+      case "priceHigh":
+        return b.currentBid - a.currentBid;
+
+      case "mostBids":
+        return (b.totalBids ?? 0) - (a.totalBids ?? 0);
+
+      default:
+        return 0;
+    }
+  });
 
   /* ================= PLACE BID ================= */
   const placeBid = async (id: string, currentBid: number) => {
