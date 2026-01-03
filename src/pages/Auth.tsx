@@ -13,11 +13,11 @@ import { useAuth } from "@/context/AuthContent";
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
 
-  // 🔐 OTP states
+  // OTP
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
 
-  // Form fields
+  // Fields
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,49 +31,62 @@ const Auth = () => {
 
   /* ================= LOGIN ================= */
   const handleLogin = async () => {
-    const res = await fetch(
-      "https://sellbee-backend-7gny.onrender.com/auth/login",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      }
-    );
+    setLoading(true);
+    try {
+      const res = await fetch(
+        "https://sellbee-backend-7gny.onrender.com/auth/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        }
+      );
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Login failed");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Login failed");
 
-    login(data.user, data.token);
-    navigate("/");
+      login(data.user, data.token);
+      navigate("/");
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   /* ================= SEND OTP ================= */
   const handleSendOtp = async () => {
-    const res = await fetch(
-      "https://sellbee-backend-7gny.onrender.com/auth/send-otp",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          email,
-          password,
-          collegeId,
-          phone,
-        }),
-      }
-    );
+    setLoading(true);
+    try {
+      const res = await fetch(
+        "https://sellbee-backend-7gny.onrender.com/auth/send-otp",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name,
+            email,
+            password,
+            collegeId,
+            phone,
+          }),
+        }
+      );
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to send OTP");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to send OTP");
 
-    setOtpSent(true);
+      setOtpSent(true);
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   /* ================= VERIFY OTP ================= */
   const handleVerifyOtp = async () => {
-    setLoading(true); // ✅ REQUIRED
-
+    setLoading(true);
     try {
       const res = await fetch(
         "https://sellbee-backend-7gny.onrender.com/auth/verify-otp",
@@ -92,29 +105,17 @@ const Auth = () => {
     } catch (err: any) {
       alert(err.message);
     } finally {
-      setLoading(false); // ✅ STOPS INFINITE LOADER
+      setLoading(false);
     }
   };
 
   /* ================= FORM SUBMIT ================= */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // ⛔ CRITICAL: block submit when OTP screen is active
-    if (!isLogin && otpSent) return;
-
-    setLoading(true);
-
-    try {
-      if (isLogin) {
-        await handleLogin();
-      } else {
-        await handleSendOtp();
-      }
-    } catch (err: any) {
-      alert(err.message);
-    } finally {
-      setLoading(false);
+    if (isLogin) {
+      handleLogin();
+    } else {
+      handleSendOtp();
     }
   };
 
@@ -179,7 +180,6 @@ const Auth = () => {
               </Button>
             )}
 
-            {/* 🔐 OTP STEP */}
             {otpSent && !isLogin && (
               <>
                 <Input
@@ -195,7 +195,7 @@ const Auth = () => {
                   className="w-full"
                   disabled={loading}
                 >
-                  {loading ? "Verifying..." : "Verify OTP"}
+                  {loading ? "Please wait..." : "Verify OTP"}
                 </Button>
               </>
             )}
