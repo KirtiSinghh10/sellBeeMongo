@@ -47,7 +47,7 @@ const Auth = () => {
     navigate("/");
   };
 
-  /* ================= SEND OTP (SIGNUP STEP 1) ================= */
+  /* ================= SEND OTP ================= */
   const handleSendOtp = async () => {
     const res = await fetch(
       "https://sellbee-backend-7gny.onrender.com/auth/send-otp",
@@ -70,27 +70,39 @@ const Auth = () => {
     setOtpSent(true);
   };
 
-  /* ================= VERIFY OTP (SIGNUP STEP 2) ================= */
+  /* ================= VERIFY OTP ================= */
   const handleVerifyOtp = async () => {
-    const res = await fetch(
-      "https://sellbee-backend-7gny.onrender.com/auth/verify-otp",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp }),
-      }
-    );
+    setLoading(true); // ✅ REQUIRED
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Invalid OTP");
+    try {
+      const res = await fetch(
+        "https://sellbee-backend-7gny.onrender.com/auth/verify-otp",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, otp }),
+        }
+      );
 
-    login(data.user, data.token);
-    navigate("/");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Invalid OTP");
+
+      login(data.user, data.token);
+      navigate("/");
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setLoading(false); // ✅ STOPS INFINITE LOADER
+    }
   };
 
   /* ================= FORM SUBMIT ================= */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // ⛔ CRITICAL: block submit when OTP screen is active
+    if (!isLogin && otpSent) return;
+
     setLoading(true);
 
     try {
@@ -167,7 +179,7 @@ const Auth = () => {
               </Button>
             )}
 
-            {/* 🔐 OTP INPUT */}
+            {/* 🔐 OTP STEP */}
             {otpSent && !isLogin && (
               <>
                 <Input
@@ -181,8 +193,9 @@ const Auth = () => {
                   type="button"
                   onClick={handleVerifyOtp}
                   className="w-full"
+                  disabled={loading}
                 >
-                  Verify OTP
+                  {loading ? "Verifying..." : "Verify OTP"}
                 </Button>
               </>
             )}
@@ -193,6 +206,7 @@ const Auth = () => {
                 setIsLogin(!isLogin);
                 setOtpSent(false);
                 setOtp("");
+                setLoading(false);
               }}
             >
               {isLogin
