@@ -13,46 +13,92 @@ import { useAuth } from "@/context/AuthContent";
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
 
+  // 🔐 OTP states
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState("");
+
+  // Form fields
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [collegeId, setCollegeId] = useState("");
-  const [phone, setphone]=useState("");
+  const [phone, setPhone] = useState("");
 
   const [loading, setLoading] = useState(false);
 
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  /* ================= LOGIN ================= */
+  const handleLogin = async () => {
+    const res = await fetch(
+      "https://sellbee-backend-7gny.onrender.com/auth/login",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      }
+    );
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Login failed");
+
+    login(data.user, data.token);
+    navigate("/");
+  };
+
+  /* ================= SEND OTP (SIGNUP STEP 1) ================= */
+  const handleSendOtp = async () => {
+    const res = await fetch(
+      "https://sellbee-backend-7gny.onrender.com/auth/send-otp",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          collegeId,
+          phone,
+        }),
+      }
+    );
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Failed to send OTP");
+
+    setOtpSent(true);
+  };
+
+  /* ================= VERIFY OTP (SIGNUP STEP 2) ================= */
+  const handleVerifyOtp = async () => {
+    const res = await fetch(
+      "https://sellbee-backend-7gny.onrender.com/auth/verify-otp",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, otp }),
+      }
+    );
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Invalid OTP");
+
+    login(data.user, data.token);
+    navigate("/");
+  };
+
+  /* ================= FORM SUBMIT ================= */
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); // 🔥 REQUIRED
+    e.preventDefault();
     setLoading(true);
 
     try {
-      const res = await fetch(
-        isLogin
-          ?"https://sellbee-backend-7gny.onrender.com/auth/login"
-    : "https://sellbee-backend-7gny.onrender.com/auth/signup",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(
-            isLogin
-              ? { email, password }
-              : { name, email, password, collegeId, phone }
-          ),
-        }
-      );
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Authentication failed");
+      if (isLogin) {
+        await handleLogin();
+      } else {
+        await handleSendOtp();
       }
-
-      login(data.user, data.token);
-
-      navigate("/");
     } catch (err: any) {
       alert(err.message);
     } finally {
@@ -81,11 +127,11 @@ const Auth = () => {
                 />
 
                 <Input
-              placeholder="Phone Number"
-              value={phone}
-              onChange={(e) => setphone(e.target.value)}
-              required
-            />
+                  placeholder="Phone Number"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  required
+                />
 
                 <Input
                   placeholder="USN"
@@ -111,17 +157,43 @@ const Auth = () => {
               required
             />
 
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading
-                ? "Please wait..."
-                : isLogin
-                ? "Login"
-                : "Create Account"}
-            </Button>
+            {!otpSent && (
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading
+                  ? "Please wait..."
+                  : isLogin
+                  ? "Login"
+                  : "Create Account"}
+              </Button>
+            )}
+
+            {/* 🔐 OTP INPUT */}
+            {otpSent && !isLogin && (
+              <>
+                <Input
+                  placeholder="Enter 6-digit OTP"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  maxLength={6}
+                  required
+                />
+                <Button
+                  type="button"
+                  onClick={handleVerifyOtp}
+                  className="w-full"
+                >
+                  Verify OTP
+                </Button>
+              </>
+            )}
 
             <p
               className="text-sm text-center text-muted-foreground cursor-pointer"
-              onClick={() => setIsLogin(!isLogin)}
+              onClick={() => {
+                setIsLogin(!isLogin);
+                setOtpSent(false);
+                setOtp("");
+              }}
             >
               {isLogin
                 ? "Don’t have an account? Create one"
