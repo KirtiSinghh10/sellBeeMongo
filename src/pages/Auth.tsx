@@ -56,6 +56,16 @@ const Auth = () => {
 
   /* ================= SEND OTP ================= */
   const handleSendOtp = async () => {
+    if (!email.endsWith(".edu") && !email.endsWith(".ac.in")) {
+      alert("Please use your college email");
+      return;
+    }
+
+    if (password.length < 6) {
+      alert("Password must be at least 6 characters");
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await fetch(
@@ -77,6 +87,7 @@ const Auth = () => {
       if (!res.ok) throw new Error(data.message || "Failed to send OTP");
 
       setOtpSent(true);
+      alert("OTP sent to your email");
     } catch (err: any) {
       alert(err.message);
     } finally {
@@ -86,6 +97,11 @@ const Auth = () => {
 
   /* ================= VERIFY OTP ================= */
   const handleVerifyOtp = async () => {
+    if (otp.length !== 6) {
+      alert("Enter a valid 6-digit OTP");
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await fetch(
@@ -112,11 +128,7 @@ const Auth = () => {
   /* ================= FORM SUBMIT ================= */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isLogin) {
-      handleLogin();
-    } else {
-      handleSendOtp();
-    }
+    isLogin ? handleLogin() : handleSendOtp();
   };
 
   return (
@@ -130,7 +142,7 @@ const Auth = () => {
 
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {!isLogin && (
+            {!isLogin && !otpSent && (
               <>
                 <Input
                   placeholder="Name"
@@ -162,13 +174,15 @@ const Auth = () => {
               required
             />
 
-            <Input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            {!otpSent && (
+              <Input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            )}
 
             {!otpSent && (
               <Button type="submit" className="w-full" disabled={loading}>
@@ -176,7 +190,7 @@ const Auth = () => {
                   ? "Please wait..."
                   : isLogin
                   ? "Login"
-                  : "Create Account"}
+                  : "Send OTP"}
               </Button>
             )}
 
@@ -185,7 +199,9 @@ const Auth = () => {
                 <Input
                   placeholder="Enter 6-digit OTP"
                   value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
+                  onChange={(e) =>
+                    setOtp(e.target.value.replace(/\D/g, ""))
+                  }
                   maxLength={6}
                   required
                 />
@@ -197,6 +213,13 @@ const Auth = () => {
                 >
                   {loading ? "Please wait..." : "Verify OTP"}
                 </Button>
+
+                <p
+                  className="text-xs text-center text-muted-foreground cursor-pointer"
+                  onClick={handleSendOtp}
+                >
+                  Resend OTP
+                </p>
               </>
             )}
 
