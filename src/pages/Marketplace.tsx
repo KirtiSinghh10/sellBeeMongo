@@ -160,7 +160,7 @@ const Marketplace = () => {
                 <SelectContent>
                   <SelectItem value="all">All Categories</SelectItem>
                   <SelectItem value="electronics">Electronics</SelectItem>
-                  <SelectItem value="books">Books</SelectItem>
+                  <SelectItem value="Textbooks">Books</SelectItem>
                   <SelectItem value="furniture">Furniture</SelectItem>
                   <SelectItem value="other">Other</SelectItem>
                   <SelectItem value="services">Services</SelectItem>
