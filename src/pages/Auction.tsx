@@ -25,6 +25,10 @@ const AuctionPage = () => {
   const [auctions, setAuctions] = useState<Auction[]>([]);
   const [bidAmounts, setBidAmounts] = useState<Record<string, string>>({});
 
+  // 🔍 SEARCH (RESTORED)
+  const [search, setSearch] = useState("");
+
+  // 💰 PRICE FILTERS
   const [minPrice, setMinPrice] = useState<number | "">("");
   const [maxPrice, setMaxPrice] = useState<number | "">("");
 
@@ -38,7 +42,7 @@ const AuctionPage = () => {
       .catch(() => toast.error("Failed to load auctions"));
   }, []);
 
-  /* ================= TIMER TICK ================= */
+  /* ================= TIMER ================= */
   useEffect(() => {
     const interval = setInterval(() => {
       setNow(Date.now());
@@ -58,12 +62,19 @@ const AuctionPage = () => {
     return `${d}d ${h}h ${m}m`;
   };
 
-  /* ================= FILTER (ONLY MIN/MAX PRICE) ================= */
-  const filteredAuctions = auctions.filter((auction) => {
-    if (minPrice !== "" && auction.currentBid < minPrice) return false;
-    if (maxPrice !== "" && auction.currentBid > maxPrice) return false;
-    return true;
-  });
+  /* ================= FILTERS ================= */
+  const filteredAuctions = auctions
+    // 🔍 SEARCH FILTER (RESTORED)
+    .filter((auction) =>
+      auction.title.toLowerCase().includes(search.toLowerCase())
+    )
+
+    // 💰 PRICE RANGE
+    .filter((auction) => {
+      if (minPrice !== "" && auction.currentBid < minPrice) return false;
+      if (maxPrice !== "" && auction.currentBid > maxPrice) return false;
+      return true;
+    });
 
   /* ================= PLACE BID ================= */
   const placeBid = async (id: string, currentBid: number) => {
@@ -112,7 +123,15 @@ const AuctionPage = () => {
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-4xl font-bold mb-6">Auctions</h1>
 
-        {/* MIN / MAX PRICE FILTER */}
+        {/* 🔍 SEARCH BAR (RESTORED) */}
+        <Input
+          placeholder="Search auctions..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="max-w-md mb-4"
+        />
+
+        {/* 💰 PRICE FILTERS */}
         <div className="flex gap-3 mb-6">
           <Input
             type="number"
