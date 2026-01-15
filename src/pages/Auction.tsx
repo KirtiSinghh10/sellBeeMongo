@@ -19,27 +19,11 @@ type Auction = {
   totalBids?: number;
 };
 
-/* ================= FILTER TYPES ================= */
-type SortOption =
-  | "endingSoon"
-  | "newest"
-  | "priceLow"
-  | "priceHigh"
-  | "mostBids";
-
-type StatusFilter = "all" | "live" | "ended";
-type SellerFilter = "all" | "sameCollege" | "otherCollege";
-
 const AuctionPage = () => {
   const { user, token } = useAuth();
 
   const [auctions, setAuctions] = useState<Auction[]>([]);
   const [bidAmounts, setBidAmounts] = useState<Record<string, string>>({});
-  const [search, setSearch] = useState("");
-
-  const [sortBy, setSortBy] = useState<SortOption>("endingSoon");
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("live");
-  const [sellerFilter, setSellerFilter] = useState<SellerFilter>("all");
 
   const [minPrice, setMinPrice] = useState<number | "">("");
   const [maxPrice, setMaxPrice] = useState<number | "">("");
@@ -74,66 +58,11 @@ const AuctionPage = () => {
     return `${d}d ${h}h ${m}m`;
   };
 
-  /* ================= FILTER + SORT ================= */
-  const filteredAuctions = auctions
-  /* 🔍 SEARCH */
-  .filter((auction) =>
-    auction.title.toLowerCase().includes(search.toLowerCase())
-  )
-
-  /* ⏱ STATUS FILTER */
-  .filter((auction) => {
-    if (statusFilter === "all") return true;
-
-    const ended =
-      new Date(auction.endsAt).getTime() <= Date.now();
-
-    return statusFilter === "live" ? !ended : ended;
-  })
-
-  /* 🏫 SELLER FILTER */
-  .filter((auction) => {
-    if (sellerFilter === "all" || !user) return true;
-
-    return sellerFilter === "sameCollege"
-      ? auction.sellerCollegeId === user.collegeId
-      : auction.sellerCollegeId !== user.collegeId;
-  })
-
-  /* 💰 PRICE RANGE */
-  .filter((auction) => {
+  /* ================= FILTER (ONLY MIN/MAX PRICE) ================= */
+  const filteredAuctions = auctions.filter((auction) => {
     if (minPrice !== "" && auction.currentBid < minPrice) return false;
     if (maxPrice !== "" && auction.currentBid > maxPrice) return false;
     return true;
-  })
-
-  /* ↕ SORTING */
-  .sort((a, b) => {
-    switch (sortBy) {
-      case "endingSoon":
-        return (
-          new Date(a.endsAt).getTime() -
-          new Date(b.endsAt).getTime()
-        );
-
-      case "newest":
-        return (
-          new Date(b.endsAt).getTime() -
-          new Date(a.endsAt).getTime()
-        );
-
-      case "priceLow":
-        return a.currentBid - b.currentBid;
-
-      case "priceHigh":
-        return b.currentBid - a.currentBid;
-
-      case "mostBids":
-        return (b.totalBids ?? 0) - (a.totalBids ?? 0);
-
-      default:
-        return 0;
-    }
   });
 
   /* ================= PLACE BID ================= */
@@ -183,36 +112,8 @@ const AuctionPage = () => {
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-4xl font-bold mb-6">Auctions</h1>
 
-        {/* SEARCH */}
-        <Input
-          placeholder="Search auctions..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="max-w-md mb-4"
-        />
-
-        {/* FILTERS */}
-        <div className="flex flex-wrap gap-3 mb-6">
-          <select value={sortBy} onChange={(e) => setSortBy(e.target.value as SortOption)}>
-            <option value="endingSoon">Ending Soon</option>
-            <option value="newest">Newest</option>
-            <option value="priceLow">Price Low</option>
-            <option value="priceHigh">Price High</option>
-            <option value="mostBids">Most Bids</option>
-          </select>
-
-          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}>
-            <option value="all">All</option>
-            <option value="live">Live</option>
-            <option value="ended">Ended</option>
-          </select>
-
-          <select value={sellerFilter} onChange={(e) => setSellerFilter(e.target.value as SellerFilter)}>
-            <option value="all">All Sellers</option>
-            <option value="sameCollege">Same College</option>
-            <option value="otherCollege">Other Colleges</option>
-          </select>
-
+        {/* MIN / MAX PRICE FILTER */}
+        <div className="flex gap-3 mb-6">
           <Input
             type="number"
             placeholder="Min ₹"

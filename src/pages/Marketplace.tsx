@@ -28,14 +28,19 @@ type Product = {
   description: string;
   sellerPhone?: string;
   sellerEmail: string;
-  sellerTestimonial?: string;
   category?: string;
   condition?: "new" | "like-new" | "good" | "fair";
   images?: { url: string }[];
-
-  // 🔹 NEW (safe)
   isNegotiable?: boolean;
 };
+
+/* ================= SERVICE CATEGORIES ================= */
+const SERVICE_CATEGORIES = [
+  "services",
+  "tutoring",
+  "design & creative",
+  "tech & development",
+];
 
 /* ================= HELPERS ================= */
 const openWhatsApp = (phone?: string, title?: string) => {
@@ -105,8 +110,16 @@ const Marketplace = () => {
       .includes(search.toLowerCase());
 
     if (!matchText) return false;
-    if (category !== "all" && product.category !== category) return false;
-    if (condition !== "all" && product.condition !== condition) return false;
+
+    if (
+      category !== "all" &&
+      product.category?.toLowerCase() !== category
+    ) {
+      return false;
+    }
+
+    if (condition !== "all" && product.condition !== condition)
+      return false;
 
     if (priceRange !== "all") {
       const [min, max] = priceRange.split("-").map(Number);
@@ -121,155 +134,107 @@ const Marketplace = () => {
       <Navbar />
 
       <div className="container mx-auto px-4 py-8">
-        {/* HEADER */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-4 text-black">
-            Marketplace
-          </h1>
+        <h1 className="text-4xl font-bold mb-4 text-black">
+          Marketplace
+        </h1>
 
-          {/* SEARCH + FILTERS */}
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search items..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-10"
-              />
-            </div>
+        {/* SEARCH + FILTERS */}
+        <div className="flex flex-col md:flex-row gap-4 mb-8">
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search items..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-10"
+            />
+          </div>
 
-            <div className="flex gap-2 ml-auto flex-wrap">
-              <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger className="w-[160px]">
-                  <SelectValue placeholder="Category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
-                  <SelectItem value="electronics">Electronics</SelectItem>
-                  <SelectItem value="books">Books</SelectItem>
-                  <SelectItem value="furniture">Furniture</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
+          <div className="flex gap-2 flex-wrap ml-auto">
+            <Select value={category} onValueChange={setCategory}>
+              <SelectTrigger className="w-[160px]">
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                <SelectItem value="electronics">Electronics</SelectItem>
+                <SelectItem value="books">Books</SelectItem>
+                <SelectItem value="furniture">Furniture</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+                <SelectItem value="services">Services</SelectItem>
+              </SelectContent>
+            </Select>
 
-              <Select value={priceRange} onValueChange={setPriceRange}>
-                <SelectTrigger className="w-[160px]">
-                  <SelectValue placeholder="Price" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Any Price</SelectItem>
-                  <SelectItem value="0-500">Under ₹500</SelectItem>
-                  <SelectItem value="500-2000">₹500 – ₹2000</SelectItem>
-                  <SelectItem value="2000-999999">₹2000+</SelectItem>
-                </SelectContent>
-              </Select>
+            <Select value={priceRange} onValueChange={setPriceRange}>
+              <SelectTrigger className="w-[160px]">
+                <SelectValue placeholder="Price" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Any Price</SelectItem>
+                <SelectItem value="0-500">Under ₹500</SelectItem>
+                <SelectItem value="500-2000">₹500 – ₹2000</SelectItem>
+                <SelectItem value="2000-999999">₹2000+</SelectItem>
+              </SelectContent>
+            </Select>
 
-              <Select value={condition} onValueChange={setCondition}>
-                <SelectTrigger className="w-[160px]">
-                  <SelectValue placeholder="Condition" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Any Condition</SelectItem>
-                  <SelectItem value="new">New</SelectItem>
-                  <SelectItem value="like-new">Like New</SelectItem>
-                  <SelectItem value="good">Good</SelectItem>
-                  <SelectItem value="fair">Fair</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <Select value={condition} onValueChange={setCondition}>
+              <SelectTrigger className="w-[160px]">
+                <SelectValue placeholder="Condition" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Any Condition</SelectItem>
+                <SelectItem value="new">New</SelectItem>
+                <SelectItem value="like-new">Like New</SelectItem>
+                <SelectItem value="good">Good</SelectItem>
+                <SelectItem value="fair">Fair</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
-        {/* CONTENT */}
-        {loading ? (
-          <div className="text-center py-16 text-muted-foreground">
-            Loading listings...
-          </div>
-        ) : error ? (
-          <div className="text-center py-16 text-red-500">
-            {error}
-          </div>
-        ) : filteredProducts.length === 0 ? (
-          <div className="text-center py-16 text-muted-foreground">
-            No listings found
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProducts.map((product) => (
+        {/* CARDS */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredProducts.map((product) => {
+            const isService = SERVICE_CATEGORIES.includes(
+              product.category?.toLowerCase() || ""
+            );
+
+            return (
               <Card
                 key={product._id}
                 role="button"
-                tabIndex={0}
                 onClick={() => navigate(`/listing/${product._id}`)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    navigate(`/listing/${product._id}`);
-                  }
-                }}
                 className={`cursor-pointer transition hover:shadow-lg border ${
-                  product.category === "Services"
+                  isService
                     ? "bg-blue-50 border-blue-200"
                     : "bg-yellow-50 border-yellow-200"
                 }`}
               >
-                {/* TOP STRIP */}
                 <div
                   className={`h-1 w-full ${
-                    product.category === "Services"
-                      ? "bg-blue-400"
-                      : "bg-yellow-400"
+                    isService ? "bg-blue-400" : "bg-yellow-400"
                   }`}
                 />
-
-                {product.images?.[0]?.url ? (
-                  <img
-                    src={product.images[0].url}
-                    alt={product.title}
-                    className="h-40 w-full object-cover"
-                  />
-                ) : (
-                  <div className="h-40 flex items-center justify-center bg-muted text-4xl">
-                    📦
-                  </div>
-                )}
 
                 <CardHeader>
                   <h3 className="text-xl font-bold">{product.title}</h3>
 
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    <Badge variant="secondary">
-                      ₹{product.price}
-                    </Badge>
-
+                  <div className="flex gap-2 mt-2">
+                    <Badge variant="secondary">₹{product.price}</Badge>
                     <Badge
                       className={
-                        product.isNegotiable
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
-                      }
-                    >
-                      {product.isNegotiable
-                        ? "Negotiable"
-                        : "Non-Negotiable"}
-                    </Badge>
-
-                    <Badge
-                      className={
-                        product.category === "Services"
+                        isService
                           ? "bg-blue-100 text-blue-800"
                           : "bg-yellow-100 text-yellow-800"
                       }
                     >
-                      {product.category === "Services"
-                        ? "Service"
-                        : "Product"}
+                      {isService ? "Service" : "Product"}
                     </Badge>
                   </div>
                 </CardHeader>
 
                 <CardContent>
-                  <p className="text-muted-foreground line-clamp-2">
+                  <p className="line-clamp-2 text-muted-foreground">
                     {product.description}
                   </p>
                 </CardContent>
@@ -280,10 +245,7 @@ const Marketplace = () => {
                     className="flex-1"
                     onClick={(e) => {
                       e.stopPropagation();
-                      openWhatsApp(
-                        product.sellerPhone,
-                        product.title
-                      );
+                      openWhatsApp(product.sellerPhone, product.title);
                     }}
                   >
                     <MessageCircle className="h-4 w-4 mr-2" />
@@ -295,10 +257,7 @@ const Marketplace = () => {
                     className="flex-1"
                     onClick={(e) => {
                       e.stopPropagation();
-                      sendEmail(
-                        product.sellerEmail,
-                        product.title
-                      );
+                      sendEmail(product.sellerEmail, product.title);
                     }}
                   >
                     <Mail className="h-4 w-4 mr-2" />
@@ -306,9 +265,9 @@ const Marketplace = () => {
                   </Button>
                 </CardFooter>
               </Card>
-            ))}
-          </div>
-        )}
+            );
+          })}
+        </div>
       </div>
     </div>
   );
