@@ -183,6 +183,15 @@ const Auth = () => {
                 required
               />
             )}
+            {/* FORGOT PASSWORD */}
+{isLogin && !otpSent && (
+  <p
+    className="text-sm text-right text-muted-foreground cursor-pointer hover:underline"
+    onClick={() => navigate("/forgot-password")}
+  >
+    Forgot password?
+  </p>
+)}
 
             {!otpSent && (
               <Button type="submit" className="w-full" disabled={loading}>

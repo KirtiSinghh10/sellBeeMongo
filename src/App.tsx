@@ -15,6 +15,9 @@ import Auction from "./pages/Auction";
 import AddListing from "./pages/AddListing";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import ForgotPassword from "@/pages/ForgotPassword";
+
+<Route path="/forgot-password" element={<ForgotPassword />} />
 
 const queryClient = new QueryClient();
 
