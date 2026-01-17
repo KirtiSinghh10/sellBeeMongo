@@ -17,7 +17,7 @@ import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import ForgotPassword from "@/pages/ForgotPassword";
 
-<Route path="/forgot-password" element={<ForgotPassword />} />
+
 
 const queryClient = new QueryClient();
 
@@ -33,7 +33,7 @@ const App = () => (
         <Route path="/marketplace" element={<Marketplace />} />
         <Route path="/auction" element={<Auction />} />
         <Route path="/users/edit" element={<EditProfile />} />
-
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/add-listing" element={<AddListing />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="*" element={<NotFound />} />
